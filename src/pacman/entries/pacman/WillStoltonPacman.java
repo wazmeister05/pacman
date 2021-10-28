@@ -1,13 +1,12 @@
 package pacman.entries.pacman;
 
+import pacman.controllers.Controller;
 import pacman.game.Constants.MOVE;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.DM;
 import pacman.game.Game;
 
-import java.util.ArrayList;
-
-public class WillStoltonPacman extends MyPacMan{
+public class WillStoltonPacman extends Controller<MOVE> {
 
     private MOVE myMove= MOVE.NEUTRAL;
 
@@ -36,7 +35,8 @@ public class WillStoltonPacman extends MyPacMan{
                 // if it isn't in the lair, it's after Ms P.
                 if (game.getShortestPathDistance(game.getGhostCurrentNodeIndex(ghost), msPacmanLocation) < 20){
                     // if the ghost in question is closer than 10, we need to evade it
-                    return game.getNextMoveAwayFromTarget(game.getGhostCurrentNodeIndex(ghost), j, DM.PATH);
+                    return game.getNextMoveAwayFromTarget(game.getGhostCurrentNodeIndex(ghost),
+                            game.getNeighbouringNodes(msPacmanLocation), DM.PATH);
                 }
             }
         }
