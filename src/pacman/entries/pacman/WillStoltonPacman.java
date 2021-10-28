@@ -1,15 +1,17 @@
 package pacman.entries.pacman;
 
-import pacman.game.Constants;
+import pacman.game.Constants.MOVE;
+import pacman.game.Constants.GHOST;
+import pacman.game.Constants.DM;
 import pacman.game.Game;
 
 import java.util.ArrayList;
 
 public class WillStoltonPacman extends MyPacMan{
 
-    private Constants.MOVE myMove= Constants.MOVE.NEUTRAL;
+    private MOVE myMove= MOVE.NEUTRAL;
 
-    public Constants.MOVE getMove(Game game, long timeDue)
+    public MOVE getMove(Game game, long timeDue)
     {
         //Place your game logic here to play the game as Ms Pac-Man
         /*
@@ -18,26 +20,29 @@ public class WillStoltonPacman extends MyPacMan{
             - avoid inedible ghosts
             - eat edible ghosts
         I feel the best order here would be to avoid ghosts first, then eat ghosts, then eat pills.
-        But first Ms.Pacman's location is required
          */
 
+        // But first Ms.Pacman's location is required
         int msPacmanLocation = game.getPacmanCurrentNodeIndex();
 
         // avoid ghosts
-        ArrayList<Constants.GHOST> avoid = new ArrayList();
-        for(Constants.GHOST ghost: Constants.GHOST.values()){
-            if(game.getGhostEdibleTime(ghost) == 0 && game.getGhostLairTime(ghost) == 0)
-                avoid.add(ghost);
-        }
-        for(Constants.GHOST ghost : avoid) {
-            if (game.getShortestPathDistance(game.getGhostCurrentNodeIndex(ghost), msPacmanLocation) < 10){
-
+        for(GHOST ghost: GHOST.values()){
+            if(game.getGhostEdibleTime(ghost) > 0) {
+                // there's no need to continue this loop if the ghosts are edible
+                break;
+            }
+            // if the ghosts are not edible, we need to run so check if it's in the lair
+            if(game.getGhostLairTime(ghost) == 0){
+                // if it isn't in the lair, it's after Ms P.
+                if (game.getShortestPathDistance(game.getGhostCurrentNodeIndex(ghost), msPacmanLocation) < 20){
+                    // if the ghost in question is closer than 10, we need to evade it
+                    return game.getNextMoveAwayFromTarget(game.getGhostCurrentNodeIndex(ghost), j, DM.PATH);
+                }
             }
         }
 
-
         // eat ghosts
-        for(Constants.GHOST ghost: Constants.GHOST.values()){
+        for(GHOST ghost: GHOST.values()){
             if(game.isGhostEdible(ghost) && game.getGhostEdibleTime(ghost) >= 1 ){
 
             }
@@ -45,8 +50,6 @@ public class WillStoltonPacman extends MyPacMan{
 
 
         // eat pills
-
-
 
         return myMove;
     }

@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="dvssdb">
-      <change afterPath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/MyPacMan.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/entries/pacman/MyPacMan.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pacman/Executor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/Executor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,15 +47,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
           <option name="containerStateName" value="" />
         </value>
       </option>
-      <option name="TEST_OBJECT" value="CLASS" />
-      <properties />
-      <listeners />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -76,6 +74,7 @@
       <updated>1634737016335</updated>
       <workItem from="1634737017388" duration="8168000" />
       <workItem from="1635348572782" duration="8552000" />
+      <workItem from="1635375444308" duration="5995000" />
     </task>
     <task id="LOCAL-00001" summary="dvssdb">
       <created>1635348600646</created>
@@ -100,6 +99,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="dvssdb" />
