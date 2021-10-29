@@ -5,7 +5,6 @@ import pacman.game.Constants.MOVE;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.DM;
 import pacman.game.Game;
-import pacman.game.internal.Ghost;
 
 import java.util.ArrayList;
 
@@ -17,6 +16,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
     public MOVE getMove(Game game, long timeDue)
     {
+        previousLocation = game.getPacmanCurrentNodeIndex();
         //Place your game logic here to play the game as Ms Pac-Man
         /*
         The brief suggests trying to implement simple rules first.
@@ -26,19 +26,14 @@ public class WillStoltonPacman extends Controller<MOVE> {
         I feel the best order here would be to avoid ghosts first, then eat ghosts, then eat pills.
          */
 
-        // But first Ms.Pacman's location is required
-        int msPacmanLocation = game.getPacmanCurrentNodeIndex();
-
         // avoid ghosts
         for(GHOST ghost: GHOST.values()){
-            if(game.getGhostEdibleTime(ghost) > 0) {
-                // there's no need to continue this loop if the ghosts are edible
-                break;
-            }
+
             // if the ghosts are not edible, we need to run so check if it's in the lair
             if(game.getGhostLairTime(ghost) == 0){
                 // if it isn't in the lair, it's after Ms P.
-                if (game.getShortestPathDistance(game.getGhostCurrentNodeIndex(ghost), msPacmanLocation) < 40){
+                if (game.getManhattanDistance(game.getGhostCurrentNodeIndex(ghost),
+                        game.getPacmanCurrentNodeIndex()) < 40){
                     // if the ghost in question is closer than 10, we need to evade it
                     return game.getNextMoveAwayFromTarget(game.getGhostCurrentNodeIndex(ghost),
                             previousLocation, DM.PATH);
@@ -47,17 +42,10 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
         }
 
-        // eat ghosts
-        for(GHOST ghost: GHOST.values()){
-            if(game.isGhostEdible(ghost) && game.getGhostEdibleTime(ghost) >= 1 ){
-
-            }
-        }
-
-
-        // eat pills
-        int[] pills = game.getActivePillsIndices();
-        int[] powerUps = game.getActivePowerPillsIndices();
+        //TODO: this came from the internet
+        // prep for eating pills
+        int[] pills = game.getPillIndices();
+        int[] powerUps = game.getPowerPillIndices();
 
         ArrayList<Integer> nextPill = new ArrayList<>();
 
@@ -78,14 +66,23 @@ public class WillStoltonPacman extends Controller<MOVE> {
             targets[i] = nextPill.get(i);
         }
 
+        // eat ghosts
+        //TODO: Currently with this pacman eschews pills for ghosts regardless of distance
+        for(GHOST ghost: GHOST.values()){
+            // if the ghost has more than 0 seconds being edible, head to it
+            if(game.isGhostEdible(ghost) && game.getGhostEdibleTime(ghost) != 0){
+                if(game.getManhattanDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(ghost))
+                        <
+                        game.getManhattanDistance(game.getPacmanCurrentNodeIndex(), game.getPillIndex(targets[0]))){
+                    return game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(),
+                            game.getGhostCurrentNodeIndex(ghost), DM.PATH);
+                }
+            }
+        }
 
-
-
-
-
-        // set msPacman's previous location at the end of the go. This will possibly be used for running away
-        previousLocation = msPacmanLocation;
-        return game.getNextMoveTowardsTarget(msPacmanLocation, targets[0], DM.PATH);
+        return game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(),
+                game.getClosestNodeIndexFromNodeIndex(game.getPacmanCurrentNodeIndex(), targets, DM.PATH),
+                DM.PATH);
     }
 
 }
