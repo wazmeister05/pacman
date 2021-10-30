@@ -5,6 +5,7 @@ import pacman.game.Constants.MOVE;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.DM;
 import pacman.game.Game;
+import pacman.game.internal.Ghost;
 
 import java.util.ArrayList;
 
@@ -16,7 +17,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
     public MOVE getMove(Game game, long timeDue)
     {
-        previousLocation = game.getPacmanCurrentNodeIndex();
         //Place your game logic here to play the game as Ms Pac-Man
         /*
         The brief suggests trying to implement simple rules first.
@@ -35,6 +35,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 if (game.getManhattanDistance(game.getGhostCurrentNodeIndex(ghost),
                         game.getPacmanCurrentNodeIndex()) < 40){
                     // if the ghost in question is closer than 10, we need to evade it
+                    
                     return game.getNextMoveAwayFromTarget(game.getGhostCurrentNodeIndex(ghost),
                             previousLocation, DM.PATH);
                 }
@@ -74,15 +75,17 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 if(game.getManhattanDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(ghost))
                         <
                         game.getManhattanDistance(game.getPacmanCurrentNodeIndex(), game.getPillIndex(targets[0]))){
+                    previousLocation = game.getPacmanCurrentNodeIndex();
                     return game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(),
                             game.getGhostCurrentNodeIndex(ghost), DM.PATH);
                 }
             }
         }
 
+        // otherwise eat a pill
+        previousLocation = game.getPacmanCurrentNodeIndex();
         return game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(),
                 game.getClosestNodeIndexFromNodeIndex(game.getPacmanCurrentNodeIndex(), targets, DM.PATH),
                 DM.PATH);
     }
-
 }
