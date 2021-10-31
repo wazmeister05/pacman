@@ -5,7 +5,6 @@ import pacman.game.Constants.MOVE;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.DM;
 import pacman.game.Game;
-import pacman.game.internal.Ghost;
 
 import java.util.ArrayList;
 
@@ -30,16 +29,31 @@ public class WillStoltonPacman extends Controller<MOVE> {
         for(GHOST ghost: GHOST.values()){
 
             // if the ghosts are not edible, we need to run so check if it's in the lair
-            if(game.getGhostLairTime(ghost) == 0){
+            if(game.getGhostLairTime(ghost) == 0 && game.getGhostEdibleTime(ghost) == 0){
                 // if it isn't in the lair, it's after Ms P.
-                if (game.getManhattanDistance(game.getGhostCurrentNodeIndex(ghost),
+                if (game.getShortestPathDistance(game.getGhostCurrentNodeIndex(ghost),
                         game.getPacmanCurrentNodeIndex()) < 40){
                     // if the ghost in question is closer than 10, we need to evade it
-                    
                     return game.getNextMoveAwayFromTarget(game.getGhostCurrentNodeIndex(ghost),
-                            previousLocation, DM.PATH);
+                            previousLocation, DM.MANHATTAN);
                 }
                 //TODO: look at previous location use above.
+            }
+        }
+
+
+        // eat ghosts
+        //TODO: Currently with this pacman eschews pills for ghosts regardless of distance
+        for(GHOST ghost: GHOST.values()){
+            // if the ghost has more than 0 seconds being edible, head to it
+            if(game.isGhostEdible(ghost)){
+//                if(game.getManhattanDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(ghost))
+//                        <
+//                        game.getManhattanDistance(game.getPacmanCurrentNodeIndex(), closestNode)){
+                    previousLocation = game.getPacmanCurrentNodeIndex();
+                    return game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(),
+                            game.getGhostCurrentNodeIndex(ghost), DM.MANHATTAN);
+            //    }
             }
         }
 
@@ -55,6 +69,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 nextPill.add(pills[i]);
             }
         }
+
         for(int i = 0; i < powerUps.length; i++){
             if(game.isPowerPillStillAvailable(i)){
                 nextPill.add(powerUps[i]);
@@ -67,25 +82,9 @@ public class WillStoltonPacman extends Controller<MOVE> {
             targets[i] = nextPill.get(i);
         }
 
-        // eat ghosts
-        //TODO: Currently with this pacman eschews pills for ghosts regardless of distance
-        for(GHOST ghost: GHOST.values()){
-            // if the ghost has more than 0 seconds being edible, head to it
-            if(game.isGhostEdible(ghost) && game.getGhostEdibleTime(ghost) != 0){
-                if(game.getManhattanDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(ghost))
-                        <
-                        game.getManhattanDistance(game.getPacmanCurrentNodeIndex(), game.getPillIndex(targets[0]))){
-                    previousLocation = game.getPacmanCurrentNodeIndex();
-                    return game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(),
-                            game.getGhostCurrentNodeIndex(ghost), DM.PATH);
-                }
-            }
-        }
 
         // otherwise eat a pill
         previousLocation = game.getPacmanCurrentNodeIndex();
-        return game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(),
-                game.getClosestNodeIndexFromNodeIndex(game.getPacmanCurrentNodeIndex(), targets, DM.PATH),
-                DM.PATH);
+        return game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), targets[0], DM.MANHATTAN);
     }
 }
