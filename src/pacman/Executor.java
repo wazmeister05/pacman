@@ -16,13 +16,11 @@ import java.util.Random;
 import pacman.controllers.Controller;
 import pacman.controllers.HumanController;
 import pacman.controllers.examples.Legacy;
-import pacman.controllers.examples.RandomPacMan;
 import pacman.entries.pacman.WillStoltonPacman;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
 import pacman.game.GameView;
-import pacman.entries.pacman.MyPacMan;
 
 /**
  * This class may be used to execute the game in timed or un-timed modes, with
