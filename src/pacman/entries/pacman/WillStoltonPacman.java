@@ -32,7 +32,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
         // Want to avoid this position if a ghost is about to leave the lair.
         int lairNodeIndex = game.getGhostInitialNodeIndex();
 
-
         /*
         AVOID LAIR if a ghost is about to spawn.
          */
@@ -41,7 +40,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 return game.getNextMoveAwayFromTarget(lairNodeIndex, msPLocation, DM.PATH);
             }
         }
-
 
         /*
         RUN AWAY.
@@ -64,7 +62,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
             return game.getNextMoveAwayFromTarget(game.getGhostCurrentNodeIndex(closestDangerousGhost), msPLocation, DM.PATH);
         }
 
-
         /*
         EAT GHOST - VERY similar to running away.
          */
@@ -85,7 +82,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
             return game.getNextMoveTowardsTarget(msPLocation,
                     game.getGhostCurrentNodeIndex(closestEdibleGhost), DM.PATH);
         }
-
 
         /*
         EAT PILLS
@@ -117,9 +113,8 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
         if(game.isJunction(msPLocation)){
             //////////////////////////////////////////////////////////////////////////////////// FIX THIS
-            return game.getNextMoveTowardsTarget(msPLocation,
-                    game.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
-                    DM.PATH);
+            MOVE[] moves = game.getPossibleMoves(msPLocation);
+
         }
         else{
             return game.getNextMoveTowardsTarget(msPLocation,
