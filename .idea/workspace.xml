@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="">
+    <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="dvssdb">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pacman/Executor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/Executor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,19 +47,6 @@
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="CLASS" />
-      <properties />
-      <listeners />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
