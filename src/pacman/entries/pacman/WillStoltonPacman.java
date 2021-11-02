@@ -111,10 +111,10 @@ public class WillStoltonPacman extends Controller<MOVE> {
         }
 
         if (game.isJunction(msPLocation)) {
-            //////////////////////////////////////////////////////////////////////////////////// FIX THIS
-            //MOVE[] moves = game.getPossibleMoves(msPLocation);
-            int[] path = game.getShortestPath(msPLocation, targets[0]);
-
+            int[] path = game.getShortestPath(msPLocation, targets[targets.length-1]);
+            return game.getNextMoveTowardsTarget(msPLocation,
+                    game.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
+                    DM.PATH);
         } else {
             return game.getNextMoveTowardsTarget(msPLocation,
                     game.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
