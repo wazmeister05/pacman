@@ -17,7 +17,6 @@ import pacman.game.Constants.GHOST;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -91,36 +90,40 @@ public class WillStoltonPacman extends Controller<MOVE> {
     }
 
 
-    private MOVE routeToPills(Game game, int msPLocation){
+    private MOVE routeToPills(Game game, int msPLocation) {
         ArrayList<Integer> nextPill = new ArrayList<>();
         int[] pills = game.getPillIndices();
         int[] powerUps = Arrays.stream(game.getPowerPillIndices()).toArray();
 
-        for(int i = 0; i < pills.length; i++){
-            if(game.isPillStillAvailable(i)){
+        for (int i = 0; i < pills.length; i++) {
+            if (game.isPillStillAvailable(i)) {
                 nextPill.add(pills[i]);
             }
         }
-        for(int i = 0; i < powerUps.length; i++){
-            if(game.isPowerPillStillAvailable(i)){
+        for (int i = 0; i < powerUps.length; i++) {
+            if (game.isPowerPillStillAvailable(i)) {
                 nextPill.add(powerUps[i]);
             }
         }
         int[] targets = new int[nextPill.size()];
-        for(int i = 0; i < targets.length; i++){
+        for (int i = 0; i < targets.length; i++) {
             targets[i] = nextPill.get(i);
         }
 
-        if(game.isJunction(msPLocation)){
+        if (game.isJunction(msPLocation)) {
             //////////////////////////////////////////////////////////////////////////////////// FIX THIS
-            MOVE[] moves = game.getPossibleMoves(msPLocation);
+            //MOVE[] moves = game.getPossibleMoves(msPLocation);
+            int[] path = game.getShortestPath(msPLocation, targets[0]);
 
-        }
-        else{
+        } else {
             return game.getNextMoveTowardsTarget(msPLocation,
                     game.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
                     DM.PATH);
-
         }
     }
+
+    private void Pathfinder(){
+
+    }
+
 }
