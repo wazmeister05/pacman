@@ -12,13 +12,13 @@ import pacman.game.Game;
 public class MyPacMan extends Controller<MOVE>
 {
 	private MOVE myMove=MOVE.NEUTRAL;
-	
-	public MOVE getMove(Game game, long timeDue) 
+
+	public MOVE getMove(Game game, long timeDue)
 	{
 		//Place your game logic here to play the game as Ms Pac-Man
-		
-		
-		
+
+
+
 		return myMove;
 	}
 }

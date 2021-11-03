@@ -17,8 +17,11 @@ import pacman.game.Constants.GHOST;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
-import java.util.ArrayList;
-import java.util.Arrays;
+import pacman.game.internal.Maze;
+import pacman.game.internal.Node;
+
+import java.util.*;
+import java.util.stream.IntStream;
 
 public class WillStoltonPacman extends Controller<MOVE> {
 
@@ -112,19 +115,23 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
         if (game.isJunction(msPLocation)) {
             Game copy = game.copy();
-            return pathfinder(copy, msPLocation);
+            Maze maze = copy.getCurrentMaze();
+
+
+
+
+
+
+
+//            Pathfinder pathfinder = new Pathfinder(maze);
+//            return pathfinder.findPath(copy, msPLocation, targets);
+            return game.getNextMoveTowardsTarget(msPLocation,
+                    game.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
+                    DM.PATH);
         } else {
             return game.getNextMoveTowardsTarget(msPLocation,
                     game.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
                     DM.PATH);
         }
     }
-
-    private MOVE pathfinder(Game copy, int msPLocation){
-        int[] path = copy.getShortestPath(msPLocation, targets[targets.length-1]);
-        return copy.getNextMoveTowardsTarget(msPLocation,
-                copy.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
-                DM.PATH);
-    }
-
 }
