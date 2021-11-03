@@ -111,10 +111,8 @@ public class WillStoltonPacman extends Controller<MOVE> {
         }
 
         if (game.isJunction(msPLocation)) {
-            int[] path = game.getShortestPath(msPLocation, targets[targets.length-1]);
-            return game.getNextMoveTowardsTarget(msPLocation,
-                    game.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
-                    DM.PATH);
+            Game copy = game.copy();
+            return pathfinder(copy, msPLocation);
         } else {
             return game.getNextMoveTowardsTarget(msPLocation,
                     game.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
@@ -122,8 +120,11 @@ public class WillStoltonPacman extends Controller<MOVE> {
         }
     }
 
-    private void Pathfinder(){
-
+    private MOVE pathfinder(Game copy, int msPLocation){
+        int[] path = copy.getShortestPath(msPLocation, targets[targets.length-1]);
+        return copy.getNextMoveTowardsTarget(msPLocation,
+                copy.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
+                DM.PATH);
     }
 
 }
