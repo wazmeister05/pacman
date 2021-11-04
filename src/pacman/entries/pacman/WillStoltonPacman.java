@@ -17,6 +17,7 @@ import pacman.game.Constants.GHOST;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
+import pacman.game.internal.AStar;
 import pacman.game.internal.Maze;
 import pacman.game.internal.Node;
 
@@ -89,58 +90,116 @@ public class WillStoltonPacman extends Controller<MOVE> {
         EAT PILLS
          */
         // If the above two sections don't return anything, we want to return an action to go for pills.
-        return routeToPills(game, msPLocation);
+        ArrayList<Integer> allPills = routeToPills(game);
+        ArrayList<Integer> allPowerPills = routeToPowerPills(game);
+        ArrayList<Integer> ghosts = allGhosts(game);
+        return search(game.copy(), msPLocation, allPills, allPowerPills, ghosts);
     }
 
+//    private ArrayList<Integer> routeToPills(Game game, int msPLocation) {
+//        ArrayList<Integer> allPills = new ArrayList<>();
+//        int[] pills = game.getActivePillsIndices();
+//        int[] powerPills = game.getActivePowerPillsIndices();
+//
+//        for (int i = 0; i < pills.length; i++) {
+//            if (game.isPillStillAvailable(i)) {
+//                allPills.add(pills[i]);
+//            }
+//        }
+//        for (int i = 0; i < powerPills.length; i++) {
+//            if (game.isPowerPillStillAvailable(i)) {
+//                allPills.add(powerPills[i]);
+//            }
+//        }
+//
+//        int[] targets = new int[allPills.size()];
+//        for (int i = 0; i < targets.length; i++) {
+//            targets[i] = allPills.get(i);
+//        }
+//
+//        return allPills;
+//    }
+//
+//
+//    private MOVE search(Game copy, int msPLocation, ArrayList<Integer> pills){
+//
+//        PriorityQueue<Integer> frontier = new PriorityQueue<>();
+//        PriorityQueue<Integer> visited = new PriorityQueue<>();
+//        frontier.add(msPLocation);
+//        ArrayList<Integer> solutionIndexes = new ArrayList<>();
+//
+//        while(!frontier.isEmpty()){
+//            int location = frontier.remove();
+//            int[] neighbours = copy.getNeighbouringNodes(location);
+//            for(int entry : neighbours){
+//                if()
+//                    frontier.add(entry);
+//            }
+//        }
+//        return null;
+//    }
 
-    private MOVE routeToPills(Game game, int msPLocation) {
-        ArrayList<Integer> nextPill = new ArrayList<>();
-        int[] pills = game.getPillIndices();
-        int[] powerUps = Arrays.stream(game.getPowerPillIndices()).toArray();
+    private ArrayList<Integer> routeToPills(Game game) {
+        ArrayList<Integer> allPills = new ArrayList<>();
+        int[] pills = game.getActivePillsIndices();
 
         for (int i = 0; i < pills.length; i++) {
             if (game.isPillStillAvailable(i)) {
-                nextPill.add(pills[i]);
+                allPills.add(pills[i]);
             }
         }
-        for (int i = 0; i < powerUps.length; i++) {
+        return allPills;
+    }
+
+    private ArrayList<Integer> routeToPowerPills(Game game) {
+        ArrayList<Integer> allPills = new ArrayList<>();
+        int[] powerPills = game.getActivePowerPillsIndices();
+
+        for (int i = 0; i < powerPills.length; i++) {
             if (game.isPowerPillStillAvailable(i)) {
-                nextPill.add(powerUps[i]);
+                allPills.add(powerPills[i]);
             }
         }
-        int[] targets = new int[nextPill.size()];
-        for (int i = 0; i < targets.length; i++) {
-            targets[i] = nextPill.get(i);
+        return allPills;
+    }
+
+    private ArrayList<Integer> allGhosts(Game game) {
+        ArrayList<Integer> ghosts = new ArrayList<>();
+        for (GHOST ghost : GHOST.values()) {
+            ghosts.add(game.getGhostCurrentNodeIndex(ghost));
         }
-
-        if (game.isJunction(msPLocation)) {
-            Game copy = game.copy();
-            Maze maze = copy.getCurrentMaze();
-            int cost = 0;
+        return ghosts;
+    }
 
 
-            PriorityQueue<Integer> frontier = new PriorityQueue<>();
-            frontier.add(msPLocation);
+    private MOVE search(Game copy, int msPLocation, ArrayList<Integer> allPills, ArrayList<Integer> allPowerPills, ArrayList<Integer> allGhosts){
 
-            while(!frontier.isEmpty()){
-                int[] neighbours = copy.getNeighbouringNodes(frontier.peek());
-                if(frontier.peek() == targets[0]) {
-                    break;
+//        int[] targets = new int[allPills.size()];
+//        for (int i = 0; i < targets.length; i++) {
+//            targets[i] = allPills.get(i);
+//        }
+
+        PriorityQueue<Integer> frontier = new PriorityQueue<>();
+        PriorityQueue<Integer> visited = new PriorityQueue<>();
+        frontier.add(msPLocation);
+        ArrayList<Integer> solutionIndexes = new ArrayList<>();
+        int score = 0;
+        while(!frontier.isEmpty()){
+            int location = frontier.remove();
+            int[] neighbours = copy.getNeighbouringNodes(location);
+            for(int entry : neighbours){
+                if(allPills.contains(entry)){
+                    score += 10;
                 }
-
-                for(int entry : neighbours){
-
+                else if(allPowerPills.contains(entry)){
+                    score += 50;
                 }
+                else if(allGhosts.contains(entry)){
+                    score -= 200;
+                }
+                frontier.add(entry);
             }
-
-
-            return game.getNextMoveTowardsTarget(msPLocation,
-                    game.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
-                    DM.PATH);
-        } else {
-            return game.getNextMoveTowardsTarget(msPLocation,
-                    game.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
-                    DM.PATH);
         }
+        return null;
     }
 }
