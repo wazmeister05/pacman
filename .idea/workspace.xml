@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="before this was fine">
+    <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="right, still broken but less to be done to fix it">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" afterDir="false" />
     </list>
@@ -170,7 +170,14 @@
       <option name="project" value="LOCAL" />
       <updated>1636043308915</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="right, still broken but less to be done to fix it">
+      <created>1636045361815</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1636045361815</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -195,7 +202,8 @@
     <MESSAGE value="now just working on pill eating&#10;thinking an informed tree search?" />
     <MESSAGE value="ergh" />
     <MESSAGE value="before this was fine" />
-    <option name="LAST_COMMIT_MESSAGE" value="before this was fine" />
+    <MESSAGE value="right, still broken but less to be done to fix it" />
+    <option name="LAST_COMMIT_MESSAGE" value="right, still broken but less to be done to fix it" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

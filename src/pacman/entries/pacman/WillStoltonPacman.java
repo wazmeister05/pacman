@@ -17,16 +17,9 @@ import pacman.game.Constants.GHOST;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
-import pacman.game.internal.AStar;
-import pacman.game.internal.Maze;
-import pacman.game.internal.Node;
-
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class WillStoltonPacman extends Controller<MOVE> {
-
-    private MOVE myMove=MOVE.NEUTRAL;
 
     public MOVE getMove(Game game, long timeDue)
     {
@@ -90,10 +83,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         EAT PILLS
          */
         // If the above two sections don't return anything, we want to return an action to go for pills.
-        ArrayList<Integer> allPills = routeToPills(game);
-        ArrayList<Integer> allPowerPills = routeToPowerPills(game);
-        ArrayList<Integer> ghosts = allGhosts(game);
-        return search(game.copy(), msPLocation, allPills, allPowerPills, ghosts);
+        return search(game, msPLocation);
     }
 
 
@@ -202,56 +192,10 @@ public class WillStoltonPacman extends Controller<MOVE> {
     }
 
     */
-
-
-
-//    private ArrayList<Integer> routeToPills(Game game, int msPLocation) {
-//        ArrayList<Integer> allPills = new ArrayList<>();
-//        int[] pills = game.getActivePillsIndices();
-//        int[] powerPills = game.getActivePowerPillsIndices();
-//
-//        for (int i = 0; i < pills.length; i++) {
-//            if (game.isPillStillAvailable(i)) {
-//                allPills.add(pills[i]);
-//            }
-//        }
-//        for (int i = 0; i < powerPills.length; i++) {
-//            if (game.isPowerPillStillAvailable(i)) {
-//                allPills.add(powerPills[i]);
-//            }
-//        }
-//
-//        int[] targets = new int[allPills.size()];
-//        for (int i = 0; i < targets.length; i++) {
-//            targets[i] = allPills.get(i);
-//        }
-//
-//        return allPills;
-//    }
-//
-//
-//    private MOVE search(Game copy, int msPLocation, ArrayList<Integer> pills){
-//
-//        PriorityQueue<Integer> frontier = new PriorityQueue<>();
-//        PriorityQueue<Integer> visited = new PriorityQueue<>();
-//        frontier.add(msPLocation);
-//        ArrayList<Integer> solutionIndexes = new ArrayList<>();
-//
-//        while(!frontier.isEmpty()){
-//            int location = frontier.remove();
-//            int[] neighbours = copy.getNeighbouringNodes(location);
-//            for(int entry : neighbours){
-//                if()
-//                    frontier.add(entry);
-//            }
-//        }
-//        return null;
-//    }
-
+    // Get the index of active pills still in play
     private ArrayList<Integer> routeToPills(Game game) {
         ArrayList<Integer> allPills = new ArrayList<>();
         int[] pills = game.getActivePillsIndices();
-
         for (int i = 0; i < pills.length; i++) {
             if (game.isPillStillAvailable(i)) {
                 allPills.add(pills[i]);
@@ -260,6 +204,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         return allPills;
     }
 
+    // Get the index of active power pills still in play
     private ArrayList<Integer> routeToPowerPills(Game game) {
         ArrayList<Integer> allPills = new ArrayList<>();
         int[] powerPills = game.getActivePowerPillsIndices();
@@ -272,6 +217,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         return allPills;
     }
 
+    // Get the index of the ghosts
     private ArrayList<Integer> allGhosts(Game game) {
         ArrayList<Integer> ghosts = new ArrayList<>();
         for (GHOST ghost : GHOST.values()) {
@@ -280,13 +226,18 @@ public class WillStoltonPacman extends Controller<MOVE> {
         return ghosts;
     }
 
-
-    private MOVE search(Game copy, int msPLocation, ArrayList<Integer> allPills, ArrayList<Integer> allPowerPills, ArrayList<Integer> allGhosts){
-
-//        int[] targets = new int[allPills.size()];
-//        for (int i = 0; i < targets.length; i++) {
-//            targets[i] = allPills.get(i);
-//        }
+    // Search for the best route
+    private MOVE search(Game game, int msPLocation){
+        ArrayList<Integer> allPills = routeToPills(game);
+        ArrayList<Integer> allPowerPills = routeToPowerPills(game);
+        ArrayList<Integer> ghosts = allGhosts(game);
+        int[] targets = new int[allPills.size() + allPowerPills.size()];
+        for (int i = 0; i < allPills.size(); i++) {
+            targets[i] = allPills.get(i);
+        }
+        for (int i = allPills.size(); i < allPowerPills.size(); i++) {
+            targets[i] = allPowerPills.get(i);
+        }
 
         PriorityQueue<Integer> frontier = new PriorityQueue<>();
         PriorityQueue<Integer> visited = new PriorityQueue<>();
@@ -295,7 +246,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         int score = 0;
         while(!frontier.isEmpty()){
             int location = frontier.remove();
-            int[] neighbours = copy.getNeighbouringNodes(location);
+            int[] neighbours = game.getNeighbouringNodes(location);
             for(int entry : neighbours){
                 if(allPills.contains(entry)){
                     score += 10;
@@ -303,12 +254,16 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 else if(allPowerPills.contains(entry)){
                     score += 50;
                 }
-                else if(allGhosts.contains(entry)){
+                else if(ghosts.contains(entry)){
                     score -= 200;
                 }
                 frontier.add(entry);
             }
         }
-        return null;
+
+        // default return so I can test that I still get 50%
+        return game.getNextMoveTowardsTarget(msPLocation,
+                game.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
+                DM.PATH);
     }
 }
