@@ -143,5 +143,4 @@ public class WillStoltonPacman extends Controller<MOVE> {
                     DM.PATH);
         }
     }
-
 }
