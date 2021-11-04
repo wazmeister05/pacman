@@ -116,15 +116,24 @@ public class WillStoltonPacman extends Controller<MOVE> {
         if (game.isJunction(msPLocation)) {
             Game copy = game.copy();
             Maze maze = copy.getCurrentMaze();
+            int cost = 0;
 
 
+            PriorityQueue<Integer> frontier = new PriorityQueue<>();
+            frontier.add(msPLocation);
+
+            while(!frontier.isEmpty()){
+                int[] neighbours = copy.getNeighbouringNodes(frontier.peek());
+                if(frontier.peek() == targets[0]) {
+                    break;
+                }
+
+                for(int entry : neighbours){
+
+                }
+            }
 
 
-
-
-
-//            Pathfinder pathfinder = new Pathfinder(maze);
-//            return pathfinder.findPath(copy, msPLocation, targets);
             return game.getNextMoveTowardsTarget(msPLocation,
                     game.getClosestNodeIndexFromNodeIndex(msPLocation, targets, DM.PATH),
                     DM.PATH);
@@ -134,4 +143,5 @@ public class WillStoltonPacman extends Controller<MOVE> {
                     DM.PATH);
         }
     }
+
 }
