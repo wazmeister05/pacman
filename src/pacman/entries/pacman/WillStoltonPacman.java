@@ -17,8 +17,6 @@ import pacman.game.Constants.GHOST;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
-
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class WillStoltonPacman extends Controller<MOVE> {
@@ -29,7 +27,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
         int msPLocation = game.getPacmanCurrentNodeIndex();
 
         //////////////////////////////////// NEED THIS?
-
         /*
         AVOID LAIR if a ghost is about to spawn.
          */
@@ -51,7 +48,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         int nextClosestGhostIndex = 0;
         int ghostDist = 12;
         for(GHOST ghost: GHOST.values()){
-            // If the ghost is still in the lair, we can ignore it.
+            // If the ghost is still in the lair or edible, we can ignore it.
             if(game.getGhostLairTime(ghost) == 0 && game.getGhostEdibleTime(ghost) == 0){
                 // If it isn't in the lair, it's after Ms P.
                 int shortestPathDist = game.getShortestPathDistance(game.getGhostCurrentNodeIndex(ghost), msPLocation);
@@ -60,7 +57,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
                     ghostDist = shortestPathDist;
                     closestGhostIndex = game.getGhostCurrentNodeIndex(ghost);
                 }
-                else{
+                else if(shortestPathDist == ghostDist){
                     nextClosestGhostIndex = game.getGhostCurrentNodeIndex(ghost);
                 }
             }
@@ -90,8 +87,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
         }
 
-        //TODO: avoid ghosts when chasing edible ghosts
-        // If there is an edible ghost, snack.
+        // If there is an edible ghost, snack, but not if there is a dangerous ghost in the way.
         if(closestEdibleGhost != null) {
             int[] pathToSnack = game.getShortestPath(msPLocation, closestEdibleGhostIndex);
             for(int entry : pathToSnack){

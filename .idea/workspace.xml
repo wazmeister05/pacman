@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="right, still broken but less to be done to fix it">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pacman/Executor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/Executor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -176,7 +178,21 @@
       <option name="project" value="LOCAL" />
       <updated>1636045361815</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="right, still broken but less to be done to fix it">
+      <created>1636066979504</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1636066979504</updated>
+    </task>
+    <task id="LOCAL-00013" summary="right, still broken but less to be done to fix it&#10;&#10;LOOK at fixing running logic when chasing edible ghosts">
+      <created>1636072107349</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1636072107349</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -202,7 +218,8 @@
     <MESSAGE value="ergh" />
     <MESSAGE value="before this was fine" />
     <MESSAGE value="right, still broken but less to be done to fix it" />
-    <option name="LAST_COMMIT_MESSAGE" value="right, still broken but less to be done to fix it" />
+    <MESSAGE value="right, still broken but less to be done to fix it&#10;&#10;LOOK at fixing running logic when chasing edible ghosts" />
+    <option name="LAST_COMMIT_MESSAGE" value="right, still broken but less to be done to fix it&#10;&#10;LOOK at fixing running logic when chasing edible ghosts" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

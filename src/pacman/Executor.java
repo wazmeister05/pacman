@@ -47,9 +47,10 @@ public class Executor {
 		// run multiple games in batch mode - good for testing.
 		// From Damien: This is the version to run to get an estimated grade for
 		// your submission
-
+		boolean visual = true;
 		int numTrials = 10;
 		exec.runExperiment(new WillStoltonPacman(), new Legacy(), numTrials);
+		//exec.runGameTimed(new WillStoltonPacman(), new Legacy(), visual);
 
 		// run a game in synchronous mode: game waits until controllers respond.
 		// int delay = 16;
@@ -58,13 +59,10 @@ public class Executor {
 
 		/// *
 		// run the game in asynchronous mode.
-		boolean visual = true;
+
 		// exec.runGameTimed(new NearestPillPacMan(),new
 		// AggressiveGhosts(),visual);
 		// exec.runGameTimed(new RandomPacMan(), new Legacy(), visual);
-
-
-		//exec.runGameTimed(new WillStoltonPacman(), new Legacy(), visual);
 
 
 		// exec.runGameTimed(new HumanController(new KeyBoardInput()),new
