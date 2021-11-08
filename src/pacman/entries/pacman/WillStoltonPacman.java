@@ -105,7 +105,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
         // EAT PILLS
         // If the above two sections don't return anything, we want to return an action to go for pills.
-        //buildTree(msPLocation, game, allGhosts(game), routeToPills(game), routeToPowerPills(game));
         buildTree(msPLocation, game);
         return search(game, msPLocation);
     }
@@ -205,6 +204,9 @@ public class WillStoltonPacman extends Controller<MOVE> {
             } else if (pills.contains(index)) {
                 parent.setScore(10);
             }
+            else{
+                parent.setScore(1);
+            }
             int[] children = game.getNeighbouringNodes(index);
             for (int child : children) {
                 Node newNode = new Node(child);
@@ -214,61 +216,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
         }
     }
 
-//    /**
-//     * Create the root node and begin building the tree
-//     * @param msPLocation index of mrs p
-//     * @param game game object
-//     * @param ghosts list of ghost locations
-//     * @param pills list of pill locations
-//     * @param powerPills list of powerpill locations
-//     */
-//    private void buildTree(int msPLocation, Game game, ArrayList<Integer> ghosts, ArrayList<Integer> pills, ArrayList<Integer> powerPills){
-//        tree = new Tree();
-//        Node root = new Node(msPLocation, 0);
-//        tree.setRoot(root);
-//        visited = new HashSet<>();
-//        visited.clear();
-//        visited.add(msPLocation);
-//        buildTree(root, game, ghosts, pills, powerPills);
-//    }
-//
-//
-//    /**
-//     * Continue to build the tree after having added the root
-//     * @param parent parent node
-//     * @param game game object
-//     * @param ghosts list of ghost locations
-//     * @param pills list of pill locations
-//     * @param powerPills list of powerpill locations
-//     */
-//    private void buildTree(Node parent, Game game, ArrayList<Integer> ghosts, ArrayList<Integer> pills, ArrayList<Integer> powerPills){
-//        int[] neighbours = game.getNeighbouringNodes(parent.getIndex());
-//        for(int index:neighbours){
-//            if(!visited.contains(index)) {
-//                visited.add(index);
-//                Node newNode = new Node(index, 0);
-//                parent.addChild(newNode);
-//                // kill the tree at the ghost nodes
-//                if (ghosts.contains(index)) {
-//                    newNode.setScore(-200);
-//                    //System.out.println(newNode.getScore());
-//                } else if (powerPills.contains(index)) {
-//                    newNode.setScore(50);
-//                    //System.out.println(newNode.getScore());
-//                    buildTree(newNode, game, ghosts, pills, powerPills);
-//                } else if (pills.contains(index)) {
-//                    newNode.setScore(10);
-//                    //System.out.println(newNode.getScore());
-//                    buildTree(newNode, game, ghosts, pills, powerPills);
-//                }
-//                else{
-//                    newNode.setScore(1);
-//                    buildTree(newNode, game, ghosts, pills, powerPills);
-//                }
-//            }
-//        }
-//    }
-
 
     /**
      * Search for the best route
@@ -277,54 +224,49 @@ public class WillStoltonPacman extends Controller<MOVE> {
      * @return return a move to the AI
      */
     private MOVE search(Game game, int msPLocation){
-        checkWin();
-        int[] finalRoute = new int[route.size()];
-        for(int i = 0; i < finalRoute.length; i++){
-            finalRoute[i] = route.get(i);
+        Node start = tree.getRoot();
+        Node destination = execute(start);
+
+        if(destination.getScore() == -200){
+            return game.getNextMoveAwayFromTarget(destination.getIndex(), msPLocation, DM.PATH);
+        }
+        else if(destination == -2){
+            return MOVE.NEUTRAL;
+        }
+        else {
+            return game.getNextMoveTowardsTarget(msPLocation,
+                    game.getClosestNodeIndexFromNodeIndex(msPLocation, finalRoute, DM.PATH),
+                    DM.PATH);
+            //return game.getNextMoveTowardsTarget(msPLocation, destinationIndex, DM.PATH);
         }
 
-//        PriorityQueue<Integer> frontier = new PriorityQueue<>();
-//        PriorityQueue<Integer> visited = new PriorityQueue<>();
-//        frontier.add(msPLocation);
-//        ArrayList<Integer> solutionIndexes = new ArrayList<>();
-
-
-        // default return so I can test that I still get 50%
-        return game.getNextMoveTowardsTarget(msPLocation,
-                game.getClosestNodeIndexFromNodeIndex(msPLocation, finalRoute, DM.PATH),
-                DM.PATH);
-
     }
 
-    ArrayList<Integer> route = new ArrayList<>();
+    int depth = 0;
 
-    public boolean checkWin() {
-        Node root = tree.getRoot();
-        checkWin(root);
-        return root.getScore() == 1;
-    }
+    public Node execute(Node startNode) {
+        Stack<Node> nodeStack = new Stack<>();
+        ArrayList<Node> visitedNodes = new ArrayList<>();
+        nodeStack.add(startNode);
 
-    private void checkWin(Node node) {
-        List<Node> children = node.getChildren();
-        System.out.println(children.size());
-        boolean isMaxPlayer = node.isMaxPlayer();
-        children.forEach(child -> {
-            if (child.getScore() == -200) {
-                child.setScore(isMaxPlayer ? 1 : -1);
+        depth = 0;
+
+        while (!nodeStack.isEmpty()) {
+            if (depth <= 10) {
+                Node current = nodeStack.pop();
+                if (current.getScore() == -200) {
+                    System.out.print(visitedNodes);
+                    System.out.println("Enemy node found");
+                    return current;
+                } else {
+                    visitedNodes.add(current);
+                    nodeStack.addAll(current.getChildren());
+                    depth++;
+                }
             } else {
-                route.add(child.getIndex());
-                checkWin(child);
+                return visitedNodes.get(0);
             }
-        });
-        Node bestChild = findBestChild(isMaxPlayer, children);
-        node.setScore(bestChild.getScore());
-    }
-
-    private Node findBestChild(boolean isMaxPlayer, List<Node> children) {
-        Comparator<Node> byScoreComparator = Comparator.comparing(Node::getScore);
-
-        return children.stream()
-                .max(isMaxPlayer ? byScoreComparator : byScoreComparator.reversed())
-                .orElseThrow(NoSuchElementException::new);
+        }
+        return null;
     }
 }
