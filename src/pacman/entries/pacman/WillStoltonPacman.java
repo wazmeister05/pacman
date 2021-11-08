@@ -105,7 +105,8 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
         // EAT PILLS
         // If the above two sections don't return anything, we want to return an action to go for pills.
-        buildTree(msPLocation, game, allGhosts(game), routeToPills(game), routeToPowerPills(game));
+        //buildTree(msPLocation, game, allGhosts(game), routeToPills(game), routeToPowerPills(game));
+        buildTree(msPLocation, game);
         return search(game, msPLocation);
     }
 
@@ -172,56 +173,101 @@ public class WillStoltonPacman extends Controller<MOVE> {
      * Create the root node and begin building the tree
      * @param msPLocation index of mrs p
      * @param game game object
-     * @param ghosts list of ghost locations
-     * @param pills list of pill locations
-     * @param powerPills list of powerpill locations
      */
-    private void buildTree(int msPLocation, Game game, ArrayList<Integer> ghosts, ArrayList<Integer> pills, ArrayList<Integer> powerPills){
+    private void buildTree(int msPLocation, Game game){
         tree = new Tree();
-        Node root = new Node(msPLocation, 0);
+        Node root = new Node(msPLocation);
         tree.setRoot(root);
         visited = new HashSet<>();
-        visited.clear();
-        visited.add(msPLocation);
+        ArrayList<Integer> ghosts = allGhosts(game);
+        ArrayList<Integer> pills = routeToPills(game);
+        ArrayList<Integer> powerPills = routeToPowerPills(game);
         buildTree(root, game, ghosts, pills, powerPills);
     }
 
 
     /**
      * Continue to build the tree after having added the root
-     * @param parent parent node
+     * @param parent parent node object
      * @param game game object
      * @param ghosts list of ghost locations
      * @param pills list of pill locations
      * @param powerPills list of powerpill locations
      */
     private void buildTree(Node parent, Game game, ArrayList<Integer> ghosts, ArrayList<Integer> pills, ArrayList<Integer> powerPills){
-        int[] neighbours = game.getNeighbouringNodes(parent.getIndex());
-        for(int index:neighbours){
-            if(!visited.contains(index)) {
-                visited.add(index);
-                Node newNode = new Node(index, 0);
+        int index = parent.getIndex();
+        if(!visited.contains(index)) {
+            visited.add(index);
+            if (ghosts.contains(index)) {
+                parent.setScore(-200);
+            } else if (powerPills.contains(index)) {
+                parent.setScore(50);
+            } else if (pills.contains(index)) {
+                parent.setScore(10);
+            }
+            int[] children = game.getNeighbouringNodes(index);
+            for (int child : children) {
+                Node newNode = new Node(child);
                 parent.addChild(newNode);
-                // kill the tree at the ghost nodes
-                if (ghosts.contains(index)) {
-                    newNode.setScore(-200);
-                    //System.out.println(newNode.getScore());
-                } else if (powerPills.contains(index)) {
-                    newNode.setScore(50);
-                    //System.out.println(newNode.getScore());
-                    buildTree(newNode, game, ghosts, pills, powerPills);
-                } else if (pills.contains(index)) {
-                    newNode.setScore(10);
-                    //System.out.println(newNode.getScore());
-                    buildTree(newNode, game, ghosts, pills, powerPills);
-                }
-                else{
-                    newNode.setScore(1);
-                    buildTree(newNode, game, ghosts, pills, powerPills);
-                }
+                buildTree(newNode, game, ghosts, pills, powerPills);
             }
         }
     }
+
+//    /**
+//     * Create the root node and begin building the tree
+//     * @param msPLocation index of mrs p
+//     * @param game game object
+//     * @param ghosts list of ghost locations
+//     * @param pills list of pill locations
+//     * @param powerPills list of powerpill locations
+//     */
+//    private void buildTree(int msPLocation, Game game, ArrayList<Integer> ghosts, ArrayList<Integer> pills, ArrayList<Integer> powerPills){
+//        tree = new Tree();
+//        Node root = new Node(msPLocation, 0);
+//        tree.setRoot(root);
+//        visited = new HashSet<>();
+//        visited.clear();
+//        visited.add(msPLocation);
+//        buildTree(root, game, ghosts, pills, powerPills);
+//    }
+//
+//
+//    /**
+//     * Continue to build the tree after having added the root
+//     * @param parent parent node
+//     * @param game game object
+//     * @param ghosts list of ghost locations
+//     * @param pills list of pill locations
+//     * @param powerPills list of powerpill locations
+//     */
+//    private void buildTree(Node parent, Game game, ArrayList<Integer> ghosts, ArrayList<Integer> pills, ArrayList<Integer> powerPills){
+//        int[] neighbours = game.getNeighbouringNodes(parent.getIndex());
+//        for(int index:neighbours){
+//            if(!visited.contains(index)) {
+//                visited.add(index);
+//                Node newNode = new Node(index, 0);
+//                parent.addChild(newNode);
+//                // kill the tree at the ghost nodes
+//                if (ghosts.contains(index)) {
+//                    newNode.setScore(-200);
+//                    //System.out.println(newNode.getScore());
+//                } else if (powerPills.contains(index)) {
+//                    newNode.setScore(50);
+//                    //System.out.println(newNode.getScore());
+//                    buildTree(newNode, game, ghosts, pills, powerPills);
+//                } else if (pills.contains(index)) {
+//                    newNode.setScore(10);
+//                    //System.out.println(newNode.getScore());
+//                    buildTree(newNode, game, ghosts, pills, powerPills);
+//                }
+//                else{
+//                    newNode.setScore(1);
+//                    buildTree(newNode, game, ghosts, pills, powerPills);
+//                }
+//            }
+//        }
+//    }
 
 
     /**
@@ -260,6 +306,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
     private void checkWin(Node node) {
         List<Node> children = node.getChildren();
+        System.out.println(children.size());
         boolean isMaxPlayer = node.isMaxPlayer();
         children.forEach(child -> {
             if (child.getScore() == -200) {

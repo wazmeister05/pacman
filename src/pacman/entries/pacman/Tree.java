@@ -6,6 +6,7 @@ package pacman.entries.pacman;
 public class Tree {
     private Node root;
 
+
     /**
      * Tree constructor
      */
@@ -28,5 +29,10 @@ public class Tree {
         this.root = root;
     }
 
-
+    void printTree(Node root){
+        System.out.println(root.getIndex());
+        for(Node child: root.getChildren()){
+            System.out.println(child.getIndex());
+        }
+    }
 }

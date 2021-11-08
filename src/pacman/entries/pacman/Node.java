@@ -13,11 +13,11 @@ public class Node {
     private List<Node> children;
     private int index;
 
-    public Node(int index, int score) {
+    public Node(int index) {
         this.index = index;
-        //this.isMaxPlayer = true;
-        this.score = score;
-        children = new ArrayList<>();
+        this.isMaxPlayer = true;
+        this.score = 0;
+        this.children = new ArrayList<>();
     }
 
     boolean isMaxPlayer() {

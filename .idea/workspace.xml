@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="Lets try this minmax thing">
+    <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="built tree but about to break it">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pacman/Executor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/Executor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/entries/pacman/Node.java" afterDir="false" />
@@ -208,7 +208,14 @@
       <option name="project" value="LOCAL" />
       <updated>1636333048826</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="built tree but about to break it">
+      <created>1636388718186</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1636388718186</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -236,7 +243,8 @@
     <MESSAGE value="right, still broken but less to be done to fix it" />
     <MESSAGE value="right, still broken but less to be done to fix it&#10;&#10;LOOK at fixing running logic when chasing edible ghosts" />
     <MESSAGE value="Lets try this minmax thing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Lets try this minmax thing" />
+    <MESSAGE value="built tree but about to break it" />
+    <option name="LAST_COMMIT_MESSAGE" value="built tree but about to break it" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
