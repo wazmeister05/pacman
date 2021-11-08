@@ -6,7 +6,6 @@ package pacman.entries.pacman;
 public class Tree {
     private Node root;
 
-
     /**
      * Tree constructor
      */
@@ -28,4 +27,6 @@ public class Tree {
     void setRoot(Node root) {
         this.root = root;
     }
+
+
 }

@@ -15,6 +15,7 @@ public class Node {
 
     public Node(int index, int score) {
         this.index = index;
+        //this.isMaxPlayer = true;
         this.score = score;
         children = new ArrayList<>();
     }
