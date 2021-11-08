@@ -2,25 +2,29 @@ package pacman.entries.pacman;
 
 import java.util.ArrayList;
 import java.util.List;
+/**
+ * Node class for making nodes for tree
+ */
 
 public class Node {
-    private int noOfBones;
+
     private boolean isMaxPlayer;
     private int score;
     private List<Node> children;
+    private int index;
 
-    public Node(int noOfBones, boolean isMaxPlayer) {
-        this.noOfBones = noOfBones;
-        this.isMaxPlayer = isMaxPlayer;
+    public Node(int index, int score) {
+        this.index = index;
+        this.score = score;
         children = new ArrayList<>();
-    }
-
-    int getNoOfBones() {
-        return noOfBones;
     }
 
     boolean isMaxPlayer() {
         return isMaxPlayer;
+    }
+
+    int getIndex() {
+        return index;
     }
 
     int getScore() {
