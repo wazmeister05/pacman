@@ -64,14 +64,14 @@ public class WillStoltonPacman extends Controller<MOVE> {
         }
 
 
-        // AVOID LAIR if a ghost is about to spawn.
-        // Want to avoid this position if a ghost is about to leave the lair.
-        int lairNodeIndex = game.getGhostInitialNodeIndex();
-        for(GHOST ghost: ghosts){
-            if(game.getGhostLairTime(ghost) < 1 && Arrays.asList(game.getNeighbouringNodes(msPLocation)).contains(lairNodeIndex)){
-                return game.getNextMoveAwayFromTarget(lairNodeIndex, msPLocation, DM.PATH);
-            }
-        }
+//        // AVOID LAIR if a ghost is about to spawn.
+//        // Want to avoid this position if a ghost is about to leave the lair.
+//        int lairNodeIndex = game.getGhostInitialNodeIndex();
+//        for(GHOST ghost: ghosts){
+//            if(game.getGhostLairTime(ghost) < 2 && Arrays.asList(game.getNeighbouringNodes(msPLocation)).contains(lairNodeIndex)){
+//                return game.getNextMoveAwayFromTarget(lairNodeIndex, msPLocation, DM.PATH);
+//            }
+//        }
 
 
         // EAT GHOST
@@ -92,7 +92,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         }
 
         // If there is an edible ghost, snack, but not if there is a dangerous ghost in the way.
-        if(closestEdibleGhost != null) {
+        if(closestEdibleGhost != null && game.getShortestPathDistance(msPLocation, closestEdibleGhostIndex) < game.getShortestPathDistance(msPLocation, nextClosestGhostIndex)) {
             int[] pathToSnack = game.getShortestPath(msPLocation, closestEdibleGhostIndex);
             for(int entry : pathToSnack){
                 if(entry == nextClosestGhostIndex){
@@ -105,7 +105,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
         // EAT PILLS
         // If the above two sections don't return anything, we want to return an action to go for pills.
-        buildTree(msPLocation, game);
+        //buildTree(msPLocation, game);
         return search(game, msPLocation);
     }
 
@@ -224,27 +224,47 @@ public class WillStoltonPacman extends Controller<MOVE> {
      * @return return a move to the AI
      */
     private MOVE search(Game game, int msPLocation){
-        Node start = tree.getRoot();
-        Node destination = execute(start);
 
-        if(destination.getScore() == -200){
-            return game.getNextMoveAwayFromTarget(destination.getIndex(), msPLocation, DM.PATH);
+        /*
+        keep this for now
+         */
+        ArrayList<Integer> pills = routeToPills(game);
+        ArrayList<Integer> powerPills = routeToPowerPills(game);
+        int[] finalRoute = new int[pills.size() + powerPills.size()];
+        for(int i = 0; i < pills.size(); i++){
+            finalRoute[i] = pills.get(i);
         }
-        else if(destination == -2){
-            return MOVE.NEUTRAL;
+        for(int i = 0; i < powerPills.size(); i++){
+            finalRoute[i] = powerPills.get(i);
         }
-        else {
-            return game.getNextMoveTowardsTarget(msPLocation,
-                    game.getClosestNodeIndexFromNodeIndex(msPLocation, finalRoute, DM.PATH),
-                    DM.PATH);
-            //return game.getNextMoveTowardsTarget(msPLocation, destinationIndex, DM.PATH);
-        }
+        return game.getNextMoveTowardsTarget(msPLocation,
+                game.getClosestNodeIndexFromNodeIndex(msPLocation, finalRoute, DM.PATH),
+                DM.PATH);
+        /*
+        EOF
+         */
+
+//        Node start = tree.getRoot();
+//        int destination = execute(start);
+//
+//        if(destination == -200){
+//            return game.getNextMoveAwayFromTarget(destination, msPLocation, DM.PATH);
+//        }
+//        else if(destination == -1){
+//            return MOVE.NEUTRAL;
+//        }
+//        else {
+//            return game.getNextMoveTowardsTarget(msPLocation,
+//                    game.getClosestNodeIndexFromNodeIndex(msPLocation, finalRoute, DM.PATH),
+//                    DM.PATH);
+//            //return game.getNextMoveTowardsTarget(msPLocation, destination, DM.PATH);
+//        }
 
     }
 
     int depth = 0;
 
-    public Node execute(Node startNode) {
+    public int execute(Node startNode) {
         Stack<Node> nodeStack = new Stack<>();
         ArrayList<Node> visitedNodes = new ArrayList<>();
         nodeStack.add(startNode);
@@ -257,16 +277,16 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 if (current.getScore() == -200) {
                     System.out.print(visitedNodes);
                     System.out.println("Enemy node found");
-                    return current;
+                    return current.getIndex();
                 } else {
                     visitedNodes.add(current);
                     nodeStack.addAll(current.getChildren());
                     depth++;
                 }
             } else {
-                return visitedNodes.get(0);
+                return visitedNodes.get(visitedNodes.size() - 1).getIndex();
             }
         }
-        return null;
+        return -1;
     }
 }
