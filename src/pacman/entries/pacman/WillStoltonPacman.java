@@ -36,63 +36,59 @@ public class WillStoltonPacman extends Controller<MOVE> {
         // We'll need this a lot throughout so making it easy.
         int msPLocation = game.getPacmanCurrentNodeIndex();
 
+        GHOST[] ghosts = GHOST.values();
+
+        // Now build the tree for the later search
+        // buildTree(msPLocation, game);
+
+        // AVOID LAIR if a ghost is about to spawn.
+        // Want to avoid this position if a ghost is about to leave the lair.
+        int lairNodeIndex = game.getGhostInitialNodeIndex();
+//        for(GHOST ghost: ghosts){
+//            if(game.getGhostLairTime(ghost) < 2 && Arrays.asList(game.getNeighbouringNodes(msPLocation)).contains(lairNodeIndex)){
+//                return game.getNextMoveAwayFromTarget(lairNodeIndex, msPLocation, DM.PATH);
+//            }
+//        }
         // RUN AWAY
         // Need to avoid ghosts first and foremost. No point doing everything else if there are ghosts nearby.
         GHOST closestDangerousGhost = null;
         int closestGhostIndex = 0;
         int nextClosestGhostIndex = 0;
-        int ghostDist = 12;
-        GHOST[] ghosts = GHOST.values();
+        int ghostDist = 10;
+        GHOST closestEdibleGhost = null;
+        int closestGhostDistance = Integer.MAX_VALUE;
+        int closestEdibleGhostIndex = 0;
+
         for(GHOST ghost: ghosts){
             // If the ghost is still in the lair or edible, we can ignore it.
-            if(game.getGhostLairTime(ghost) == 0 && game.getGhostEdibleTime(ghost) == 0){
+            int shortestPathDist = game.getShortestPathDistance(game.getGhostCurrentNodeIndex(ghost), msPLocation);
+            if(game.getGhostLairTime(ghost) == 0  && shortestPathDist < ghostDist){
                 // If it isn't in the lair, it's after Ms P.
-                int shortestPathDist = game.getShortestPathDistance(game.getGhostCurrentNodeIndex(ghost), msPLocation);
-                if (shortestPathDist < ghostDist){
-                    closestDangerousGhost = ghost;
-                    ghostDist = shortestPathDist;
-                    closestGhostIndex = game.getGhostCurrentNodeIndex(ghost);
+                closestDangerousGhost = ghost;
+                ghostDist = shortestPathDist;
+                closestGhostIndex = game.getGhostCurrentNodeIndex(ghost);
+
+            }
+            else if(game.getGhostLairTime(ghost) == 0 && game.getGhostEdibleTime(ghost) != 0){
+                if(shortestPathDist < closestGhostDistance){
+                    closestEdibleGhost = ghost;
+                    closestGhostDistance = shortestPathDist;
+                    closestEdibleGhostIndex = game.getGhostCurrentNodeIndex(ghost);
                 }
-                else if(shortestPathDist == ghostDist){
-                    nextClosestGhostIndex = game.getGhostCurrentNodeIndex(ghost);
-                }
+            }
+            else if(game.getGhostLairTime(ghost) < 3 && Arrays.asList(game.getNeighbouringNodes(msPLocation)).contains(lairNodeIndex)){
+                return game.getNextMoveAwayFromTarget(lairNodeIndex, msPLocation, DM.PATH);
+            }
+            else{
+                nextClosestGhostIndex = game.getGhostCurrentNodeIndex(ghost);
             }
         }
         // If there is a closest ghost, run away from it. Now.
         if(closestDangerousGhost != null){
             return game.getNextMoveAwayFromTarget(closestGhostIndex, msPLocation, DM.PATH);
         }
-
-
-//        // AVOID LAIR if a ghost is about to spawn.
-//        // Want to avoid this position if a ghost is about to leave the lair.
-//        int lairNodeIndex = game.getGhostInitialNodeIndex();
-//        for(GHOST ghost: ghosts){
-//            if(game.getGhostLairTime(ghost) < 2 && Arrays.asList(game.getNeighbouringNodes(msPLocation)).contains(lairNodeIndex)){
-//                return game.getNextMoveAwayFromTarget(lairNodeIndex, msPLocation, DM.PATH);
-//            }
-//        }
-
-
-        // EAT GHOST
-        // If we've eaten a power pill, ghosts can be consumed, so lets go for them.
-        GHOST closestEdibleGhost = null;
-        int closestGhostDistance = Integer.MAX_VALUE;
-        int closestEdibleGhostIndex = 0;
-        for(GHOST ghost: ghosts){
-            // if the ghost has more than 0 seconds being edible, head to it
-            if(game.getGhostEdibleTime(ghost) > 0){
-                int shortestPath = game.getShortestPathDistance(msPLocation, game.getGhostCurrentNodeIndex(ghost));
-                if(shortestPath < closestGhostDistance){
-                    closestEdibleGhost = ghost;
-                    closestGhostDistance = shortestPath;
-                    closestEdibleGhostIndex = game.getGhostCurrentNodeIndex(ghost);
-                }
-            }
-        }
-
-        // If there is an edible ghost, snack, but not if there is a dangerous ghost in the way.
-        if(closestEdibleGhost != null && game.getShortestPathDistance(msPLocation, closestEdibleGhostIndex) < game.getShortestPathDistance(msPLocation, nextClosestGhostIndex)) {
+        // But if there isn't, and there is an edible ghost, take that instead.
+        else if(closestEdibleGhost != null){
             int[] pathToSnack = game.getShortestPath(msPLocation, closestEdibleGhostIndex);
             for(int entry : pathToSnack){
                 if(entry == nextClosestGhostIndex){
@@ -101,12 +97,9 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
             return game.getNextMoveTowardsTarget(msPLocation, closestEdibleGhostIndex, DM.PATH);
         }
-
-
-        // EAT PILLS
-        // If the above two sections don't return anything, we want to return an action to go for pills.
-        //buildTree(msPLocation, game);
-        return search(game, msPLocation);
+        else{
+            return search(game, msPLocation);
+        }
     }
 
 
