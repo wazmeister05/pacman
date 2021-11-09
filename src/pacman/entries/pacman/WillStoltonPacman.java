@@ -35,22 +35,13 @@ public class WillStoltonPacman extends Controller<MOVE> {
     {
         // We'll need this a lot throughout so making it easy.
         int msPLocation = game.getPacmanCurrentNodeIndex();
-
+        int lairNodeIndex = game.getGhostInitialNodeIndex();
         GHOST[] ghosts = GHOST.values();
 
         // Now build the tree for the later search
         // buildTree(msPLocation, game);
 
-        // AVOID LAIR if a ghost is about to spawn.
-        // Want to avoid this position if a ghost is about to leave the lair.
-        int lairNodeIndex = game.getGhostInitialNodeIndex();
-//        for(GHOST ghost: ghosts){
-//            if(game.getGhostLairTime(ghost) < 2 && Arrays.asList(game.getNeighbouringNodes(msPLocation)).contains(lairNodeIndex)){
-//                return game.getNextMoveAwayFromTarget(lairNodeIndex, msPLocation, DM.PATH);
-//            }
-//        }
-        // RUN AWAY
-        // Need to avoid ghosts first and foremost. No point doing everything else if there are ghosts nearby.
+
         GHOST closestDangerousGhost = null;
         int closestGhostIndex = 0;
         int nextClosestGhostIndex = 0;
@@ -62,13 +53,13 @@ public class WillStoltonPacman extends Controller<MOVE> {
         for(GHOST ghost: ghosts){
             // If the ghost is still in the lair or edible, we can ignore it.
             int shortestPathDist = game.getShortestPathDistance(game.getGhostCurrentNodeIndex(ghost), msPLocation);
+            // Need to avoid ghosts first and foremost. No point doing everything else if there are ghosts nearby. Get it's location.
             if(game.getGhostLairTime(ghost) == 0  && shortestPathDist < ghostDist){
                 // If it isn't in the lair, it's after Ms P.
                 closestDangerousGhost = ghost;
                 ghostDist = shortestPathDist;
-                closestGhostIndex = game.getGhostCurrentNodeIndex(ghost);
-
             }
+            // If the ghost is edible, we can snack on it so get it's location
             else if(game.getGhostLairTime(ghost) == 0 && game.getGhostEdibleTime(ghost) != 0){
                 if(shortestPathDist < closestGhostDistance){
                     closestEdibleGhost = ghost;
@@ -76,6 +67,8 @@ public class WillStoltonPacman extends Controller<MOVE> {
                     closestEdibleGhostIndex = game.getGhostCurrentNodeIndex(ghost);
                 }
             }
+            // AVOID LAIR if a ghost is about to spawn.
+            // Want to avoid this position if a ghost is about to leave the lair, more important than checking for nearby ghosts.
             else if(game.getGhostLairTime(ghost) < 3 && Arrays.asList(game.getNeighbouringNodes(msPLocation)).contains(lairNodeIndex)){
                 return game.getNextMoveAwayFromTarget(lairNodeIndex, msPLocation, DM.PATH);
             }
@@ -83,9 +76,10 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 nextClosestGhostIndex = game.getGhostCurrentNodeIndex(ghost);
             }
         }
+
         // If there is a closest ghost, run away from it. Now.
         if(closestDangerousGhost != null){
-            return game.getNextMoveAwayFromTarget(closestGhostIndex, msPLocation, DM.PATH);
+            return game.getNextMoveAwayFromTarget(game.getGhostCurrentNodeIndex(closestDangerousGhost), msPLocation, DM.PATH);
         }
         // But if there isn't, and there is an edible ghost, take that instead.
         else if(closestEdibleGhost != null){
