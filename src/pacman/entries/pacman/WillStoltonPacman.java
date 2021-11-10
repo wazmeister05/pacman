@@ -99,7 +99,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
      * @param game game object
      * @return arraylist of pill locations
      */
-    private ArrayList<Integer> routeToPills(Game game) {
+    private ArrayList<Integer> pills(Game game) {
         ArrayList<Integer> allPills = new ArrayList<>();
         int[] pills = game.getActivePillsIndices();
         for (int i = 0; i < pills.length; i++) {
@@ -116,7 +116,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
      * @param game game object
      * @return arraylist of power pill locations
      */
-    private ArrayList<Integer> routeToPowerPills(Game game) {
+    private ArrayList<Integer> powerPills(Game game) {
         ArrayList<Integer> allPills = new ArrayList<>();
         int[] powerPills = game.getActivePowerPillsIndices();
 
@@ -143,6 +143,12 @@ public class WillStoltonPacman extends Controller<MOVE> {
         return ghosts;
     }
 
+
+    /**
+     * Get the index of the ghosts that are edible
+     * @param game game object
+     * @return arraylist of ghost locations
+     */
     private ArrayList<Integer> edibleGhosts(Game game) {
         ArrayList<Integer> ghosts = new ArrayList<>();
         for (GHOST ghost : GHOST.values()) {
@@ -175,8 +181,8 @@ public class WillStoltonPacman extends Controller<MOVE> {
         visited = new HashSet<>();
         ArrayList<Integer> ghosts = allGhosts(game);
         ArrayList<Integer> edibleGhosts = edibleGhosts(game);
-        ArrayList<Integer> pills = routeToPills(game);
-        ArrayList<Integer> powerPills = routeToPowerPills(game);
+        ArrayList<Integer> pills = pills(game);
+        ArrayList<Integer> powerPills = powerPills(game);
         buildTree(root, game, ghosts, edibleGhosts, pills, powerPills);
     }
 
@@ -225,62 +231,63 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
 
         // keep this for now
-/*
-        ArrayList<Integer> pills = routeToPills(game);
-        ArrayList<Integer> powerPills = routeToPowerPills(game);
-        int[] finalRoute = new int[pills.size() + powerPills.size()];
+
+        ArrayList<Integer> pills = pills(game);
+        ArrayList<Integer> powerPills = powerPills(game);
+        int[] allPills = new int[pills.size() + powerPills.size()];
         for(int i = 0; i < pills.size(); i++){
-            finalRoute[i] = pills.get(i);
+            allPills[i] = pills.get(i);
         }
         for(int i = 0; i < powerPills.size(); i++){
-            finalRoute[i] = powerPills.get(i);
+            allPills[i] = powerPills.get(i);
         }
         return game.getNextMoveTowardsTarget(msPLocation,
-                game.getClosestNodeIndexFromNodeIndex(msPLocation, finalRoute, DM.PATH),
+                game.getClosestNodeIndexFromNodeIndex(msPLocation, allPills, DM.PATH),
                 DM.PATH);
 
         // EOF
-*/
 
-        ArrayList<Node> destination = execute(tree.getRoot());
 
-        if(destination.get(destination.size()-1).getScore() < 0){
-            return game.getNextMoveAwayFromTarget(destination.get(destination.size()-1).getIndex(), msPLocation, DM.PATH);
-        }
-        else{
-            int[] dest = new int[destination.size()];
-            for(int i = 0; i < dest.length; i++){
-                dest[i] = destination.get(i).getIndex();
-            }
-            int closest = game.getClosestNodeIndexFromNodeIndex(msPLocation, dest, DM.PATH);
-            return game.getNextMoveTowardsTarget(msPLocation, closest, DM.PATH);
-        }
+//        ArrayList<Node> destination = execute(tree.getRoot());
+//
+//        if(destination.get(destination.size()-1).getScore() < 0){
+//            return game.getNextMoveAwayFromTarget(destination.get(destination.size()-1).getIndex(), msPLocation, DM.PATH);
+//        }
+//        else{
+//            int[] dest = new int[destination.size()];
+//            for(int i = 0; i < dest.length; i++){
+//                dest[i] = destination.get(i).getIndex();
+//            }
+//            int closest = game.getClosestNodeIndexFromNodeIndex(msPLocation, dest, DM.PATH);
+//            return game.getNextMoveTowardsTarget(msPLocation, closest, DM.PATH);
+//        }
 
 
     }
-
-    int depth = 0;
-
-    public ArrayList<Node> execute(Node startNode) {
-        Stack<Node> nodeStack = new Stack<>();
-        ArrayList<Node> visitedNodes = new ArrayList<>();
-        nodeStack.add(startNode);
-        depth = 0;
-
-        while (!nodeStack.isEmpty()) {
-            if (depth <= 50) {
-                Node current = nodeStack.pop();
-                if (current.getScore() == -200) {
-                    return visitedNodes;
-                } else {
-                    visitedNodes.add(current);
-                    nodeStack.addAll(current.getChildren());
-                    depth++;
-                }
-            } else {
-                return visitedNodes;
-            }
-        }
-        return visitedNodes;
-    }
+//
+//    int depth = 0;
+//
+//    //TODO: work out how to get the total value of a path noted.
+//    public ArrayList<Node> execute(Node startNode) {
+//        Stack<Node> nodeStack = new Stack<>();
+//        ArrayList<Node> visitedNodes = new ArrayList<>();
+//        nodeStack.add(startNode);
+//        depth = 0;
+//
+//        while (!nodeStack.isEmpty()) {
+//            if (depth <= 50) {
+//                Node current = nodeStack.pop();
+//                if (current.getScore() == -200) {
+//                    return visitedNodes;
+//                } else {
+//                    visitedNodes.add(current);
+//                    nodeStack.addAll(current.getChildren());
+//                    depth++;
+//                }
+//            } else {
+//                return visitedNodes;
+//            }
+//        }
+//        return visitedNodes;
+//    }
 }
