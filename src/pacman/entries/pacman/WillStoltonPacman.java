@@ -37,13 +37,9 @@ public class WillStoltonPacman extends Controller<MOVE> {
         int msPLocation = game.getPacmanCurrentNodeIndex();
         int lairNodeIndex = game.getGhostInitialNodeIndex();
         GHOST[] ghosts = GHOST.values();
-
-        // Now build the tree for the later search
-        // buildTree(msPLocation, game);
-
+        buildTree(msPLocation, game);
 
         GHOST closestDangerousGhost = null;
-        int closestGhostIndex = 0;
         int nextClosestGhostIndex = 0;
         int ghostDist = 10;
         GHOST closestEdibleGhost = null;
@@ -53,14 +49,15 @@ public class WillStoltonPacman extends Controller<MOVE> {
         for(GHOST ghost: ghosts){
             // If the ghost is still in the lair or edible, we can ignore it.
             int shortestPathDist = game.getShortestPathDistance(game.getGhostCurrentNodeIndex(ghost), msPLocation);
+            int lairTime = game.getGhostLairTime(ghost);
             // Need to avoid ghosts first and foremost. No point doing everything else if there are ghosts nearby. Get it's location.
-            if(game.getGhostLairTime(ghost) == 0  && shortestPathDist < ghostDist){
+            if(lairTime == 0  && shortestPathDist < ghostDist){
                 // If it isn't in the lair, it's after Ms P.
                 closestDangerousGhost = ghost;
                 ghostDist = shortestPathDist;
             }
             // If the ghost is edible, we can snack on it so get it's location
-            else if(game.getGhostLairTime(ghost) == 0 && game.getGhostEdibleTime(ghost) != 0){
+            else if(lairTime == 0 && game.getGhostEdibleTime(ghost) != 0){
                 if(shortestPathDist < closestGhostDistance){
                     closestEdibleGhost = ghost;
                     closestGhostDistance = shortestPathDist;
@@ -69,7 +66,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
             // AVOID LAIR if a ghost is about to spawn.
             // Want to avoid this position if a ghost is about to leave the lair, more important than checking for nearby ghosts.
-            else if(game.getGhostLairTime(ghost) < 3 && Arrays.asList(game.getNeighbouringNodes(msPLocation)).contains(lairNodeIndex)){
+            else if(lairTime < 3 && Arrays.asList(game.getNeighbouringNodes(msPLocation)).contains(lairNodeIndex)){
                 return game.getNextMoveAwayFromTarget(lairNodeIndex, msPLocation, DM.PATH);
             }
             else{
@@ -140,7 +137,18 @@ public class WillStoltonPacman extends Controller<MOVE> {
     private ArrayList<Integer> allGhosts(Game game) {
         ArrayList<Integer> ghosts = new ArrayList<>();
         for (GHOST ghost : GHOST.values()) {
+            if(!game.isGhostEdible(ghost))
             ghosts.add(game.getGhostCurrentNodeIndex(ghost));
+        }
+        return ghosts;
+    }
+
+    private ArrayList<Integer> edibleGhosts(Game game) {
+        ArrayList<Integer> ghosts = new ArrayList<>();
+        for (GHOST ghost : GHOST.values()) {
+            if(game.isGhostEdible(ghost)) {
+                ghosts.add(game.getGhostCurrentNodeIndex(ghost));
+            }
         }
         return ghosts;
     }
@@ -166,9 +174,10 @@ public class WillStoltonPacman extends Controller<MOVE> {
         tree.setRoot(root);
         visited = new HashSet<>();
         ArrayList<Integer> ghosts = allGhosts(game);
+        ArrayList<Integer> edibleGhosts = edibleGhosts(game);
         ArrayList<Integer> pills = routeToPills(game);
         ArrayList<Integer> powerPills = routeToPowerPills(game);
-        buildTree(root, game, ghosts, pills, powerPills);
+        buildTree(root, game, ghosts, edibleGhosts, pills, powerPills);
     }
 
 
@@ -180,12 +189,14 @@ public class WillStoltonPacman extends Controller<MOVE> {
      * @param pills list of pill locations
      * @param powerPills list of powerpill locations
      */
-    private void buildTree(Node parent, Game game, ArrayList<Integer> ghosts, ArrayList<Integer> pills, ArrayList<Integer> powerPills){
+    private void buildTree(Node parent, Game game, ArrayList<Integer> ghosts, ArrayList<Integer> edibleGhosts, ArrayList<Integer> pills, ArrayList<Integer> powerPills){
         int index = parent.getIndex();
         if(!visited.contains(index)) {
             visited.add(index);
             if (ghosts.contains(index)) {
                 parent.setScore(-200);
+            } else if(edibleGhosts.contains(index)) {
+                parent.setScore(200);
             } else if (powerPills.contains(index)) {
                 parent.setScore(50);
             } else if (pills.contains(index)) {
@@ -198,7 +209,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
             for (int child : children) {
                 Node newNode = new Node(child);
                 parent.addChild(newNode);
-                buildTree(newNode, game, ghosts, pills, powerPills);
+                buildTree(newNode, game, ghosts, edibleGhosts, pills, powerPills);
             }
         }
     }
@@ -212,9 +223,9 @@ public class WillStoltonPacman extends Controller<MOVE> {
      */
     private MOVE search(Game game, int msPLocation){
 
-        /*
-        keep this for now
-         */
+
+        // keep this for now
+/*
         ArrayList<Integer> pills = routeToPills(game);
         ArrayList<Integer> powerPills = routeToPowerPills(game);
         int[] finalRoute = new int[pills.size() + powerPills.size()];
@@ -227,53 +238,49 @@ public class WillStoltonPacman extends Controller<MOVE> {
         return game.getNextMoveTowardsTarget(msPLocation,
                 game.getClosestNodeIndexFromNodeIndex(msPLocation, finalRoute, DM.PATH),
                 DM.PATH);
-        /*
-        EOF
-         */
 
-//        Node start = tree.getRoot();
-//        int destination = execute(start);
-//
-//        if(destination == -200){
-//            return game.getNextMoveAwayFromTarget(destination, msPLocation, DM.PATH);
-//        }
-//        else if(destination == -1){
-//            return MOVE.NEUTRAL;
-//        }
-//        else {
-//            return game.getNextMoveTowardsTarget(msPLocation,
-//                    game.getClosestNodeIndexFromNodeIndex(msPLocation, finalRoute, DM.PATH),
-//                    DM.PATH);
-//            //return game.getNextMoveTowardsTarget(msPLocation, destination, DM.PATH);
-//        }
+        // EOF
+*/
+
+        ArrayList<Node> destination = execute(tree.getRoot());
+
+        if(destination.get(destination.size()-1).getScore() < 0){
+            return game.getNextMoveAwayFromTarget(destination.get(destination.size()-1).getIndex(), msPLocation, DM.PATH);
+        }
+        else{
+            int[] dest = new int[destination.size()];
+            for(int i = 0; i < dest.length; i++){
+                dest[i] = destination.get(i).getIndex();
+            }
+            int closest = game.getClosestNodeIndexFromNodeIndex(msPLocation, dest, DM.PATH);
+            return game.getNextMoveTowardsTarget(msPLocation, closest, DM.PATH);
+        }
+
 
     }
 
     int depth = 0;
 
-    public int execute(Node startNode) {
+    public ArrayList<Node> execute(Node startNode) {
         Stack<Node> nodeStack = new Stack<>();
         ArrayList<Node> visitedNodes = new ArrayList<>();
         nodeStack.add(startNode);
-
         depth = 0;
 
         while (!nodeStack.isEmpty()) {
-            if (depth <= 10) {
+            if (depth <= 50) {
                 Node current = nodeStack.pop();
                 if (current.getScore() == -200) {
-                    System.out.print(visitedNodes);
-                    System.out.println("Enemy node found");
-                    return current.getIndex();
+                    return visitedNodes;
                 } else {
                     visitedNodes.add(current);
                     nodeStack.addAll(current.getChildren());
                     depth++;
                 }
             } else {
-                return visitedNodes.get(visitedNodes.size() - 1).getIndex();
+                return visitedNodes;
             }
         }
-        return -1;
+        return visitedNodes;
     }
 }
