@@ -41,7 +41,8 @@ public class WillStoltonPacman extends Controller<MOVE> {
         buildTree(msPLocation, game);
         int[] allEdibles = getAllEdibles(game);
 
-        MOVE move = search(game.copy(), msPLocation, allEdibles, nonEdibleGhosts(game));
+        //MOVE move = search(game, msPLocation, allEdibles, nonEdibleGhosts(game));
+        MOVE move = check(game, msPLocation);
 
         GHOST closestDangerousGhost = null;
         int closestDangerousGhostIndex = 0;
@@ -111,11 +112,11 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
     /**
      * Search for the best route
-     * @param copy game object
+     * @param game game object
      * @param msPLocation mrs P location
      * @return return a move to the AI
      */
-    private MOVE search(Game copy, int msPLocation, int[] allEdibles, ArrayList<Integer> dangerGhosts){
+    private MOVE search(Game game, int msPLocation, int[] allEdibles, ArrayList<Integer> dangerGhosts){
 //        HashMap<MOVE, Integer> movesAndScores = new HashMap<>();
 //        if(copy.isJunction(msPLocation)){
 //            MOVE[] moves = copy.getPossibleMoves(msPLocation);
@@ -144,11 +145,40 @@ public class WillStoltonPacman extends Controller<MOVE> {
 //                }
 //            }
 //        }
-        return copy.getNextMoveTowardsTarget(msPLocation,
-                copy.getClosestNodeIndexFromNodeIndex(msPLocation, allEdibles, DM.PATH),
+        return game.getNextMoveTowardsTarget(msPLocation,
+                game.getClosestNodeIndexFromNodeIndex(msPLocation, allEdibles, DM.PATH),
                 DM.PATH);
     }
 
+
+    public boolean check(Game game, int msPLocation) {
+        int[] activePills = game.getActivePillsIndices();
+        int target = game.getClosestNodeIndexFromNodeIndex(msPLocation, activePills, DM.PATH);
+        int[] path = game.getShortestPath(msPLocation, target);
+
+        boolean ghostExists = false;
+
+        // find path to nearest pill and check if ghost is on it
+        for (int step = 0; (step < path.length) && !ghostExists; step++) {
+            for (GHOST ghost: GHOST.values()) {
+                if (path[step] == game.getGhostCurrentNodeIndex(ghost)) {
+                    ghostExists = true;
+                    break;
+                }
+            }
+        }
+
+        // if no ghost in the way
+        if (!ghostExists) {
+            visitedJunctions.clear();
+
+            GameView.addPoints(game, Color.MAGENTA, game.getPath(current, target));
+
+            setTarget(game.getNextPacManDir(target, true, Game.DM.PATH));
+            return true;
+        }
+        return false;
+    }
 
 
     /////////////////////////////////////////////////////////////////////////////
