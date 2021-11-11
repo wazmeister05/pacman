@@ -5,6 +5,9 @@ import pacman.game.Constants.GHOST;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
+import pacman.game.GameView;
+
+import java.awt.*;
 import java.util.*;
 /**
 The brief suggests trying to implement simple rules first.
@@ -41,8 +44,9 @@ public class WillStoltonPacman extends Controller<MOVE> {
         buildTree(msPLocation, game);
         int[] allEdibles = getAllEdibles(game);
 
-        //MOVE move = search(game, msPLocation, allEdibles, nonEdibleGhosts(game));
-        MOVE move = check(game, msPLocation);
+        MOVE move = search(game, msPLocation, allEdibles, nonEdibleGhosts(game));
+        //MOVE move = check(game, msPLocation);
+        //GameView.addPoints(game, Color.MAGENTA, );
 
         GHOST closestDangerousGhost = null;
         int closestDangerousGhostIndex = 0;
@@ -106,7 +110,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
         else{
             return move;
         }
-        //return move;
     }
 
 
@@ -151,7 +154,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
     }
 
 
-    public boolean check(Game game, int msPLocation) {
+    public MOVE check(Game game, int msPLocation) {
         int[] activePills = game.getActivePillsIndices();
         int target = game.getClosestNodeIndexFromNodeIndex(msPLocation, activePills, DM.PATH);
         int[] path = game.getShortestPath(msPLocation, target);
@@ -171,15 +174,15 @@ public class WillStoltonPacman extends Controller<MOVE> {
         // if no ghost in the way
         if (!ghostExists) {
             visitedJunctions.clear();
+            GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, target));
 
-            GameView.addPoints(game, Color.MAGENTA, game.getPath(current, target));
-
-            setTarget(game.getNextPacManDir(target, true, Game.DM.PATH));
-            return true;
+//            setTarget(game.getNextPacManDir(target, true, Game.DM.PATH));
+            return game.getNextMoveTowardsTarget(target, target, DM.PATH);
         }
-        return false;
+        return null;
     }
 
+    public static ArrayList<Integer> visitedJunctions = new ArrayList<Integer>();
 
     /////////////////////////////////////////////////////////////////////////////
     /////////////////  Create and build arrays and stuff  ///////////////////////
