@@ -41,12 +41,15 @@ public class WillStoltonPacman extends Controller<MOVE> {
         int msPLocation = game.getPacmanCurrentNodeIndex();
         int lairNodeIndex = game.getGhostInitialNodeIndex();
         GHOST[] ghosts = GHOST.values();
-        buildTree(msPLocation, game);
+        //buildTree(msPLocation, game);
         int[] allEdibles = getAllEdibles(game);
 
-        MOVE move = search(game, msPLocation, allEdibles, nonEdibleGhosts(game));
-        //MOVE move = check(game, msPLocation);
-        //GameView.addPoints(game, Color.MAGENTA, );
+        //MOVE move = search(game, msPLocation, allEdibles, nonEdibleGhosts(game));
+        MOVE move = check(game, msPLocation, ghosts, allEdibles);
+        // if the move is null, there is a ghost in front of ms p
+        if(move == null){
+
+        }
 
         GHOST closestDangerousGhost = null;
         int closestDangerousGhostIndex = 0;
@@ -110,6 +113,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         else{
             return move;
         }
+       // return move;
     }
 
 
@@ -154,18 +158,17 @@ public class WillStoltonPacman extends Controller<MOVE> {
     }
 
 
-    public MOVE check(Game game, int msPLocation) {
-        int[] activePills = game.getActivePillsIndices();
-        int target = game.getClosestNodeIndexFromNodeIndex(msPLocation, activePills, DM.PATH);
-        int[] path = game.getShortestPath(msPLocation, target);
+    public MOVE check(Game game, int msPLocation, GHOST[] ghosts, int[] edibles) {
+        int target = game.getClosestNodeIndexFromNodeIndex(msPLocation, edibles, DM.PATH);
+        int target2 = game.getClosestNodeIndexFromNodeIndex(target, edibles, DM.PATH);
+        int[] path = game.getShortestPath(msPLocation, target2);
 
         boolean ghostExists = false;
-
-        // find path to nearest pill and check if ghost is on it
         for (int step = 0; (step < path.length) && !ghostExists; step++) {
-            for (GHOST ghost: GHOST.values()) {
-                if (path[step] == game.getGhostCurrentNodeIndex(ghost)) {
+            for (GHOST ghost: ghosts) {
+                if (path[step] == game.getGhostCurrentNodeIndex(ghost) && !game.isGhostEdible(ghost)) {
                     ghostExists = true;
+                    //System.out.println("GHOST");
                     break;
                 }
             }
@@ -174,10 +177,8 @@ public class WillStoltonPacman extends Controller<MOVE> {
         // if no ghost in the way
         if (!ghostExists) {
             visitedJunctions.clear();
-            GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, target));
-
-//            setTarget(game.getNextPacManDir(target, true, Game.DM.PATH));
-            return game.getNextMoveTowardsTarget(target, target, DM.PATH);
+            GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, target2));
+            return game.getNextMoveTowardsTarget(msPLocation, target2, DM.PATH);
         }
         return null;
     }
