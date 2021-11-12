@@ -41,6 +41,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
      */
     public MOVE getMove(Game game, long timeDue)
     {
+        //Todo: not using this but could?
         if(targetAcquired) {
             if(game.wasGhostEaten(ghostTarget)){
                 targetAcquired = false;
@@ -99,7 +100,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
         }
         return chosenMove;
     }
-
 
 
     private boolean check(Game game, int[] edibles, int msPLocation, GHOST[] ghosts) {
