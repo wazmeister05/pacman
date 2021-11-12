@@ -6,10 +6,9 @@ import pacman.game.Constants.DM;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
 import pacman.game.GameView;
-
 import java.awt.*;
 import java.util.*;
-import java.util.stream.Stream;
+
 
 /**
 The brief suggests trying to implement simple rules first.
@@ -28,9 +27,10 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
     private Tree tree;
     private Set<Integer> visited;
-    private static ArrayList<Integer> visitedJunctions = new ArrayList<>();
     private GHOST ghostTarget;
     private boolean targetAcquired = false;
+    private MOVE chosenMove;
+
 
     /**
      * Main AI logic. Avoid the lair or other ghosts, then chase edible ghosts and finally
@@ -49,11 +49,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         // We'll need these throughout so make them now.
         int msPLocation = game.getPacmanCurrentNodeIndex();
         GHOST[] ghosts = GHOST.values();
-        int[] allEdibles = getAllEdibles(game);
         //buildTree(msPLocation, game);
-
-        //MOVE move = check(game, msPLocation, ghosts, allEdibles);
-        // if the move is null, there is a ghost in front of ms p
 
         Map<GHOST,Integer> edible = new HashMap<>();
         Map<GHOST,Integer> inedible = new HashMap<>();
@@ -70,10 +66,10 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
         }
 
+        // Todo: loses interest in edible ghosts if being chased... might need to see about adding them to the path?
         // If there is a closest ghost, run away from it. Now.
         for(Map.Entry<GHOST, Integer> entry : inedible.entrySet()){
             if(entry.getValue() <= 10){
-                //System.out.println("Run");
                 return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.PATH);
             }
         }
@@ -81,28 +77,39 @@ public class WillStoltonPacman extends Controller<MOVE> {
         for (Map.Entry<GHOST, Integer> entry : edible.entrySet()) {
             if (entry.getValue() <= 100) {
                 ghostTarget = entry.getKey();
-                //System.out.println("Eat");
                 GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey())));
                 return game.getNextMoveTowardsTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.PATH);
             }
         }
 
+//        MOVE move = game.getNextMoveTowardsTarget(msPLocation,
+//                game.getClosestNodeIndexFromNodeIndex(msPLocation, allEdibles, DM.PATH),
+//                DM.PATH);
 
-        //System.out.println("Drugs");
-        return game.getNextMoveTowardsTarget(msPLocation,
-                game.getClosestNodeIndexFromNodeIndex(msPLocation, allEdibles, DM.PATH),
-                DM.PATH);
+        int i = 0;
+        while(i<100){
+            int[] allEdibles = getAllEdibles(game);
+            boolean routeFound = check(game, allEdibles, msPLocation, ghosts);
+            if(routeFound){
+                break;
+            }
+            i++;
+            //Todo: break out of this - I've added the counter to 100 but not comfortable with it
+            //System.out.println("Stuck");
+        }
+        return chosenMove;
     }
 
 
-    private MOVE check(Game game, int msPLocation, GHOST[] ghosts, int[] edibles) {
+
+    private boolean check(Game game, int[] edibles, int msPLocation, GHOST[] ghosts) {
         int target = game.getClosestNodeIndexFromNodeIndex(msPLocation, edibles, DM.PATH);
         int[] path = game.getShortestPath(msPLocation, target);
 
         boolean ghostExists = false;
-        for (int step = 0; (step < path.length) && !ghostExists; step++) {
+        for (int i = 0; (i < path.length) && !ghostExists; i++) {
             for (GHOST ghost: ghosts) {
-                if (path[step] == game.getGhostCurrentNodeIndex(ghost) && !game.isGhostEdible(ghost)) {
+                if (path[i] == game.getGhostCurrentNodeIndex(ghost) && !game.isGhostEdible(ghost)) {
                     ghostExists = true;
                     break;
                 }
@@ -111,11 +118,11 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
         // if no ghost in the way
         if (!ghostExists) {
-            visitedJunctions.clear();
             GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, target));
-            return game.getNextMoveTowardsTarget(msPLocation, target, DM.PATH);
+            chosenMove = game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), target, DM.PATH);
+            return true;
         }
-        return null;
+        return false;
     }
 
 
@@ -131,7 +138,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
      */
     private ArrayList<Integer> pills(Game game) {
         ArrayList<Integer> allPills = new ArrayList<>();
-        int[] pills = game.getActivePillsIndices();
+        int[] pills = game.getPillIndices();
         for (int i = 0; i < pills.length; i++) {
             if (game.isPillStillAvailable(i)) {
                 allPills.add(pills[i]);
@@ -148,7 +155,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
      */
     private ArrayList<Integer> powerPills(Game game) {
         ArrayList<Integer> allPills = new ArrayList<>();
-        int[] powerPills = game.getActivePowerPillsIndices();
+        int[] powerPills = game.getPowerPillIndices();
 
         for (int i = 0; i < powerPills.length; i++) {
             if (game.isPowerPillStillAvailable(i)) {
@@ -267,8 +274,3 @@ public class WillStoltonPacman extends Controller<MOVE> {
         return allEdibles;
     }
 }
-
-
-
-
-
