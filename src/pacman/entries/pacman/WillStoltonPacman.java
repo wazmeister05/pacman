@@ -28,7 +28,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
     private Tree tree;
     private Set<Integer> visited;
     private GHOST ghostTarget;
-    private boolean targetAcquired = false;
     private MOVE chosenMove;
 
 
@@ -41,12 +40,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
      */
     public MOVE getMove(Game game, long timeDue)
     {
-        //Todo: not using this but could?
-        if(targetAcquired) {
-            if(game.wasGhostEaten(ghostTarget)){
-                targetAcquired = false;
-            }
-        }
         // We'll need these throughout so make them now.
         int msPLocation = game.getPacmanCurrentNodeIndex();
         GHOST[] ghosts = GHOST.values();
@@ -67,7 +60,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
         }
 
-        // Todo: loses interest in edible ghosts if being chased... might need to see about adding them to the path?
         // If there is a closest ghost, run away from it. Now.
         for(Map.Entry<GHOST, Integer> entry : inedible.entrySet()){
             if(entry.getValue() <= 10){
@@ -76,29 +68,41 @@ public class WillStoltonPacman extends Controller<MOVE> {
         }
 
         for (Map.Entry<GHOST, Integer> entry : edible.entrySet()) {
-            if (entry.getValue() <= 100) {
+            boolean routeFound = false;
+            if (entry.getValue() <= 200) {
                 ghostTarget = entry.getKey();
-                GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey())));
-                return game.getNextMoveTowardsTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.PATH);
+                //GameView.addPoints(game, Color.RED, game.getShortestPath(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey())));
+                routeFound = check(ghostTarget, game);
+                if(routeFound) {
+                    return chosenMove;
+                }
             }
         }
 
-//        MOVE move = game.getNextMoveTowardsTarget(msPLocation,
-//                game.getClosestNodeIndexFromNodeIndex(msPLocation, allEdibles, DM.PATH),
-//                DM.PATH);
-
         int i = 0;
-        while(i<100){
-            int[] allEdibles = getAllEdibles(game);
-            boolean routeFound = check(game, allEdibles, msPLocation, ghosts);
+        int[] allEdibles = getAllEdibles(game);
+        boolean routeFound = false;
+        while(i < allEdibles.length){
+            int[] ediblesTrun = Arrays.copyOfRange(allEdibles, i, allEdibles.length);
+            try {
+                routeFound = check(game, ediblesTrun, msPLocation, ghosts);
+            }
+            catch(Exception e){
+                routeFound = false;
+            }
             if(routeFound){
                 break;
             }
             i++;
-            //Todo: break out of this - I've added the counter to 100 but not comfortable with it
-            //System.out.println("Stuck");
         }
-        return chosenMove;
+        if(routeFound) {
+            return chosenMove;
+        }
+        else{
+            return game.getNextMoveTowardsTarget(msPLocation,
+                game.getClosestNodeIndexFromNodeIndex(msPLocation, allEdibles, DM.PATH),
+                DM.PATH);
+        }
     }
 
 
@@ -115,7 +119,29 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 }
             }
         }
+        // if no ghost in the way
+        if (!ghostExists) {
+            GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, target));
+            chosenMove = game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), target, DM.PATH);
+            return true;
+        }
+        return false;
+    }
 
+    private boolean check(GHOST ghostToEat, Game game){
+        int target = game.getGhostCurrentNodeIndex(ghostToEat);
+        int msPLocation = game.getPacmanCurrentNodeIndex();
+        int[] path = game.getShortestPath(game.getPacmanCurrentNodeIndex(), target);
+
+        boolean ghostExists = false;
+        for (int i = 0; (i < path.length) && !ghostExists; i++) {
+            for (GHOST ghost: GHOST.values()) {
+                if (path[i] == game.getGhostCurrentNodeIndex(ghost) && !game.isGhostEdible(ghost)) {
+                    ghostExists = true;
+                    break;
+                }
+            }
+        }
         // if no ghost in the way
         if (!ghostExists) {
             GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, target));
@@ -271,6 +297,8 @@ public class WillStoltonPacman extends Controller<MOVE> {
         for(int i = 0; i < pSize; i++){
             allEdibles[i+gSize+ppSize] = pills.get(i);
         }
+
+
         return allEdibles;
     }
 }

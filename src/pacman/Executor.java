@@ -16,6 +16,7 @@ import java.util.Random;
 import pacman.controllers.Controller;
 import pacman.controllers.HumanController;
 import pacman.controllers.examples.Legacy;
+import pacman.entries.ghosts.MemetixGhosts;
 import pacman.entries.pacman.WillStoltonPacman;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
@@ -48,7 +49,7 @@ public class Executor {
 		// From Damien: This is the version to run to get an estimated grade for
 		// your submission
 		boolean visual = true;
-		int numTrials = 10;
+		int numTrials = 1000;
 		exec.runExperiment(new WillStoltonPacman(), new Legacy(), numTrials);
 		//exec.runGameTimed(new WillStoltonPacman(), new Legacy(), visual);
 

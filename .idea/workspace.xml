@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="Might be onto something. &#10;&#10;Store the current target node persistently somehow?">
+    <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pacman/Executor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/Executor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pacman/game/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/game/Constants.java" afterDir="false" />
     </list>
@@ -18,6 +19,9 @@
         <option value="Class" />
       </list>
     </option>
+  </component>
+  <component name="Git.Merge.Settings">
+    <option name="BRANCH" value="leapoffaith" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -279,7 +283,14 @@
       <option name="project" value="LOCAL" />
       <updated>1636652893309</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Seem to have gotten something to work right">
+      <created>1636678637844</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1636678637844</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -312,7 +323,8 @@
     <MESSAGE value="Execute needs fixing" />
     <MESSAGE value="trying something&#10;&#10;Also execute still broken" />
     <MESSAGE value="Might be onto something. &#10;&#10;Store the current target node persistently somehow?" />
-    <option name="LAST_COMMIT_MESSAGE" value="Might be onto something. &#10;&#10;Store the current target node persistently somehow?" />
+    <MESSAGE value="Seem to have gotten something to work right" />
+    <option name="LAST_COMMIT_MESSAGE" value="Seem to have gotten something to work right" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

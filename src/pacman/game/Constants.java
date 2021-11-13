@@ -71,7 +71,7 @@ public final class Constants
 	public static final int NUM_GHOSTS=4;					//number of ghosts in the game
 	//public static final int NUM_GHOSTS=4;					//number of ghosts in the game
 	public static final int NUM_MAZES=4;					//number of different mazes in the game
-	public static final int DELAY=40;						//delay (in milliseconds) between game advancements
+	public static final int DELAY=20;						//delay (in milliseconds) between game advancements
 	//public static final int DELAY=40;						//delay (in milliseconds) between game advancements
 	public static final int NUM_LIVES=3;					//total number of lives Ms Pac-Man has (current + NUM_LIVES-1 spares)
 	public static final int GHOST_SPEED_REDUCTION=2;		//difference in speed when ghosts are edible (every GHOST_SPEED_REDUCTION, a ghost remains stationary)
