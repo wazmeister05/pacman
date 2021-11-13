@@ -49,7 +49,7 @@ public class Executor {
 		// From Damien: This is the version to run to get an estimated grade for
 		// your submission
 		boolean visual = true;
-		int numTrials = 1000;
+		int numTrials = 10;
 		exec.runExperiment(new WillStoltonPacman(), new Legacy(), numTrials);
 		//exec.runGameTimed(new WillStoltonPacman(), new Legacy(), visual);
 

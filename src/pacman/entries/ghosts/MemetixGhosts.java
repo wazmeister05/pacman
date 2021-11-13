@@ -87,7 +87,7 @@ public class MemetixGhosts extends Controller<EnumMap<GHOST,MOVE>> {
 				}
 			}
 		}
-		
+
 		/*
 		this.game = game;
 		walkMaze();
@@ -96,7 +96,7 @@ public class MemetixGhosts extends Controller<EnumMap<GHOST,MOVE>> {
 				GameView.addPoints(game, new Color(0, Math.max(0, 255-nodes[i].pacman), 0, 128), i);
 		}
 		*/
-		
+
 		return myMoves;
 	}
 	
@@ -175,7 +175,7 @@ public class MemetixGhosts extends Controller<EnumMap<GHOST,MOVE>> {
 	 * At each node we record the distance travelled and the arrival direction
 	 * Return an array list (1 for each ghost) containing a list of nodes where the pacman will meet the ghost (the event horizon)
 	 */
-	private ArrayList<ArrayList<Integer>> walkMaze() {
+	public ArrayList<ArrayList<Integer>> walkMaze() {
 		ArrayList<ArrayList<Integer>>	eventHorizon = new ArrayList<ArrayList<Integer>>();
 		HashSet<Integer>				pacmanEdge = new HashSet<Integer>();
 		HashSet<ghostMove>				ghostsEdge = new HashSet<ghostMove>();
@@ -318,7 +318,7 @@ public class MemetixGhosts extends Controller<EnumMap<GHOST,MOVE>> {
 	 * Look at the board positions and return a score - higher is better for the pacman
 	 * The score determines how effective a ghost not involved in blocking the pacman is
 	 */
-	private double scorePositions(ArrayList<ArrayList<Integer>> eventHorizon) {
+	public double scorePositions(ArrayList<ArrayList<Integer>> eventHorizon) {
 		double score = 100*safeScore;
 		
 		/*

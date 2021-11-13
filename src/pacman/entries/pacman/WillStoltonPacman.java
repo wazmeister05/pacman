@@ -1,6 +1,8 @@
 package pacman.entries.pacman;
 
 import pacman.controllers.Controller;
+import pacman.entries.ghosts.MemetixGhosts;
+import pacman.entries.ghosts.MoveIterator;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.MOVE;
@@ -8,6 +10,9 @@ import pacman.game.Game;
 import pacman.game.GameView;
 import java.awt.*;
 import java.util.*;
+
+import static pacman.game.Constants.*;
+import static pacman.game.Constants.EXTRA_LIFE_SCORE;
 
 
 /**
@@ -29,80 +34,132 @@ public class WillStoltonPacman extends Controller<MOVE> {
     private Set<Integer> visited;
     private GHOST ghostTarget;
     private MOVE chosenMove;
-
+    private Game game1;
+    private static final Random rnd = new Random();
+    private MemetixGhosts mm = new MemetixGhosts();
 
     /**
      * Main AI logic. Avoid the lair or other ghosts, then chase edible ghosts and finally
      * get the best route to the pills.
-     * @param game A copy of the current game
+     *
+     * @param game    A copy of the current game
      * @param timeDue The time the next move is due
      * @return the move for the AI to follow
      */
-    public MOVE getMove(Game game, long timeDue)
-    {
+    public MOVE getMove(Game game, long timeDue) {
         // We'll need these throughout so make them now.
         int msPLocation = game.getPacmanCurrentNodeIndex();
         GHOST[] ghosts = GHOST.values();
         //buildTree(msPLocation, game);
 
-        Map<GHOST,Integer> edible = new HashMap<>();
-        Map<GHOST,Integer> inedible = new HashMap<>();
+        Map<GHOST, Integer> edible = new HashMap<>();
+        Map<GHOST, Integer> inedible = new HashMap<>();
 
-        for(GHOST ghost: ghosts){
-            if(game.getGhostLairTime(ghost) == 0) {
-                int ghostIndex = game.getGhostCurrentNodeIndex(ghost);
-                if (!game.isGhostEdible(ghost)) {
-                    inedible.put(ghost, game.getShortestPathDistance(ghostIndex, msPLocation));
-                }
-                else{
-                    edible.put(ghost, game.getShortestPathDistance(ghostIndex, msPLocation));
-                }
-            }
+//        for (GHOST ghost : ghosts) {
+//            if (game.getGhostLairTime(ghost) == 0) {
+//                int ghostIndex = game.getGhostCurrentNodeIndex(ghost);
+//                if (!game.isGhostEdible(ghost)) {
+//                    inedible.put(ghost, game.getShortestPathDistance(ghostIndex, msPLocation));
+//                } else {
+//                    edible.put(ghost, game.getShortestPathDistance(ghostIndex, msPLocation));
+//                }
+//            }
+//        }
+//
+//        // If there is a closest ghost, run away from it. Now.
+//        for (Map.Entry<GHOST, Integer> entry : inedible.entrySet()) {
+//            if (entry.getValue() <= 10) {
+//                return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.PATH);
+//            }
+//        }
+//
+//        for (Map.Entry<GHOST, Integer> entry : edible.entrySet()) {
+//            boolean routeFound = false;
+//            if (entry.getValue() <= 200) {
+//                ghostTarget = entry.getKey();
+//                //GameView.addPoints(game, Color.RED, game.getShortestPath(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey())));
+//                routeFound = check(ghostTarget, game);
+//                if (routeFound) {
+//                    return chosenMove;
+//                }
+//            }
+//        }
+//
+//        int i = 0;
+//        int[] allEdibles = getAllEdibles(game);
+//        boolean routeFound = false;
+//        while (i < allEdibles.length) {
+//            int[] ediblesTrun = Arrays.copyOfRange(allEdibles, i, allEdibles.length);
+//            try {
+//                routeFound = check(game, ediblesTrun, msPLocation, ghosts);
+//            } catch (Exception e) {
+//                routeFound = false;
+//            }
+//            if (routeFound) {
+//                break;
+//            }
+//            i++;
+//        }
+//        if (routeFound) {
+//            return chosenMove;
+//        } else {
+//            return game.getNextMoveTowardsTarget(msPLocation,
+//                    game.getClosestNodeIndexFromNodeIndex(msPLocation, allEdibles, DM.PATH),
+//                    DM.PATH);
+//        }
+
+        MOVE myMove = null;
+        double best = Double.MAX_VALUE;
+        EnumMap<GHOST,MOVE> testMoves=new EnumMap<GHOST,MOVE>(GHOST.class);
+        for (GHOST g: GHOST.values())
+            testMoves.put(g, m[g.ordinal()]);
+
+
+        double highest = -1;
+        for (MOVE pacman: game.getPossibleMoves(game.getPacmanCurrentNodeIndex())) {
+            this.game1 = safeAdvance(game, pacman, testMoves);
+
+            double score = rnd.nextDouble();
+            if (!game.wasPacManEaten())
+                score += mm.scorePositions(mm.walkMaze());
+
+            if (score > highest)
+                highest = score;
         }
-
-        // If there is a closest ghost, run away from it. Now.
-        for(Map.Entry<GHOST, Integer> entry : inedible.entrySet()){
-            if(entry.getValue() <= 10){
-                return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.PATH);
-            }
+        if (highest < best) {
+            best = highest;
+            myMove = testMoves;
+            lastMove = myMove; //In case we time out - store the current best set of moves
         }
+        return myMove;
+    }
 
-        for (Map.Entry<GHOST, Integer> entry : edible.entrySet()) {
-            boolean routeFound = false;
-            if (entry.getValue() <= 200) {
-                ghostTarget = entry.getKey();
-                //GameView.addPoints(game, Color.RED, game.getShortestPath(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey())));
-                routeFound = check(ghostTarget, game);
-                if(routeFound) {
-                    return chosenMove;
-                }
-            }
-        }
 
-        int i = 0;
-        int[] allEdibles = getAllEdibles(game);
-        boolean routeFound = false;
-        while(i < allEdibles.length){
-            int[] ediblesTrun = Arrays.copyOfRange(allEdibles, i, allEdibles.length);
-            try {
-                routeFound = check(game, ediblesTrun, msPLocation, ghosts);
-            }
-            catch(Exception e){
-                routeFound = false;
-            }
-            if(routeFound){
+    private Game safeAdvance(Game game, MOVE pacman, EnumMap<GHOST,MOVE> testMoves) {
+        Game result = null;
+        boolean reversed = true;
+        /*
+         * Apply the moves. If we get a random game reverse, try again.
+         * If a ghost's last move is the opposite of what we expect and we haven't just eaten a power pill
+         * then a reverse has happened. Ghosts in the lair don't move so we can't check them.
+         */
+        GHOST toCheck = null;
+        for (GHOST g: GHOST.values())
+            if (game.getGhostLairTime(g) == 0 && game.getGhostLastMoveMade(g) != MOVE.NEUTRAL) {
+                toCheck = g;
                 break;
             }
-            i++;
+
+        while (reversed) {
+            result = game.copy();
+            result.advanceGame(pacman, testMoves);
+            reversed = (!result.gameOver() && toCheck != null &&
+                    result.getGhostLastMoveMade(toCheck) == game.getGhostLastMoveMade(toCheck).opposite() &&
+                    result.getCurrentLevel() == game.getCurrentLevel() &&
+                    result.getNumberOfActivePowerPills() == game.getNumberOfActivePowerPills());
         }
-        if(routeFound) {
-            return chosenMove;
-        }
-        else{
-            return game.getNextMoveTowardsTarget(msPLocation,
-                game.getClosestNodeIndexFromNodeIndex(msPLocation, allEdibles, DM.PATH),
-                DM.PATH);
-        }
+
+        return result;
     }
 
 
@@ -112,7 +169,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
         boolean ghostExists = false;
         for (int i = 0; (i < path.length) && !ghostExists; i++) {
-            for (GHOST ghost: ghosts) {
+            for (GHOST ghost : ghosts) {
                 if (path[i] == game.getGhostCurrentNodeIndex(ghost) && !game.isGhostEdible(ghost)) {
                     ghostExists = true;
                     break;
@@ -128,14 +185,15 @@ public class WillStoltonPacman extends Controller<MOVE> {
         return false;
     }
 
-    private boolean check(GHOST ghostToEat, Game game){
+
+    private boolean check(GHOST ghostToEat, Game game) {
         int target = game.getGhostCurrentNodeIndex(ghostToEat);
         int msPLocation = game.getPacmanCurrentNodeIndex();
         int[] path = game.getShortestPath(game.getPacmanCurrentNodeIndex(), target);
 
         boolean ghostExists = false;
         for (int i = 0; (i < path.length) && !ghostExists; i++) {
-            for (GHOST ghost: GHOST.values()) {
+            for (GHOST ghost : GHOST.values()) {
                 if (path[i] == game.getGhostCurrentNodeIndex(ghost) && !game.isGhostEdible(ghost)) {
                     ghostExists = true;
                     break;
@@ -159,6 +217,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
     /**
      * Get the index of active pills still in play
+     *
      * @param game game object
      * @return arraylist of pill locations
      */
@@ -176,6 +235,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
     /**
      * Get the index of active power pills still in play
+     *
      * @param game game object
      * @return arraylist of power pill locations
      */
@@ -194,13 +254,14 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
     /**
      * Get the index of the ghosts
+     *
      * @param game game object
      * @return arraylist of ghost locations
      */
     private ArrayList<Integer> nonEdibleGhosts(Game game) {
         ArrayList<Integer> ghosts = new ArrayList<>();
         for (GHOST ghost : GHOST.values()) {
-            if(!game.isGhostEdible(ghost))
+            if (!game.isGhostEdible(ghost))
                 ghosts.add(game.getGhostCurrentNodeIndex(ghost));
         }
         return ghosts;
@@ -209,13 +270,14 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
     /**
      * Get the index of the ghosts that are edible
+     *
      * @param game game object
      * @return arraylist of ghost locations
      */
     private ArrayList<Integer> edibleGhosts(Game game) {
         ArrayList<Integer> ghosts = new ArrayList<>();
         for (GHOST ghost : GHOST.values()) {
-            if(game.isGhostEdible(ghost)) {
+            if (game.isGhostEdible(ghost)) {
                 ghosts.add(game.getGhostCurrentNodeIndex(ghost));
             }
         }
@@ -225,10 +287,11 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
     /**
      * Create the root node and begin building the tree
+     *
      * @param msPLocation index of mrs p
-     * @param game game object
+     * @param game        game object
      */
-    private void buildTree(int msPLocation, Game game){
+    private void buildTree(int msPLocation, Game game) {
         tree = new Tree();
         Node root = new Node(msPLocation);
         tree.setRoot(root);
@@ -243,26 +306,26 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
     /**
      * Continue to build the tree after having added the root
-     * @param parent parent node object
-     * @param game game object
-     * @param ghosts list of ghost locations
-     * @param pills list of pill locations
+     *
+     * @param parent     parent node object
+     * @param game       game object
+     * @param ghosts     list of ghost locations
+     * @param pills      list of pill locations
      * @param powerPills list of powerpill locations
      */
-    private void buildTree(Node parent, Game game, ArrayList<Integer> ghosts, ArrayList<Integer> edibleGhosts, ArrayList<Integer> pills, ArrayList<Integer> powerPills){
+    private void buildTree(Node parent, Game game, ArrayList<Integer> ghosts, ArrayList<Integer> edibleGhosts, ArrayList<Integer> pills, ArrayList<Integer> powerPills) {
         int index = parent.getIndex();
-        if(!visited.contains(index)) {
+        if (!visited.contains(index)) {
             visited.add(index);
             if (ghosts.contains(index)) {
                 parent.setScore(-200);
-            } else if(edibleGhosts.contains(index)) {
+            } else if (edibleGhosts.contains(index)) {
                 parent.setScore(200);
             } else if (powerPills.contains(index)) {
                 parent.setScore(50);
             } else if (pills.contains(index)) {
                 parent.setScore(10);
-            }
-            else{
+            } else {
                 parent.setScore(1);
             }
             int[] children = game.getNeighbouringNodes(index);
@@ -288,14 +351,14 @@ public class WillStoltonPacman extends Controller<MOVE> {
         int gSize = edibleGhostLocs.size();
         int[] allEdibles = new int[pSize + ppSize + gSize];
 
-        for(int i = 0; i < gSize; i++){
+        for (int i = 0; i < gSize; i++) {
             allEdibles[i] = edibleGhostLocs.get(i);
         }
-        for(int i = 0; i < ppSize; i++){
-            allEdibles[i+gSize] = powerPills.get(i);
+        for (int i = 0; i < ppSize; i++) {
+            allEdibles[i + gSize] = powerPills.get(i);
         }
-        for(int i = 0; i < pSize; i++){
-            allEdibles[i+gSize+ppSize] = pills.get(i);
+        for (int i = 0; i < pSize; i++) {
+            allEdibles[i + gSize + ppSize] = pills.get(i);
         }
 
 
