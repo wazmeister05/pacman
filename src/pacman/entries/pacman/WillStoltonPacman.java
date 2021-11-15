@@ -23,10 +23,10 @@ The brief suggests trying to implement simple rules first.
     - eat edible ghosts
 I feel the best order here would be to avoid the lair first, then ghosts, then eat ghosts, then eat pills.
 Why?
-- If an enemy is about to spawn as we pass the lair, we'll die.
-- Getting caught by a ghost removes one of only a handful of lives, so surviving is the most important part.
-- Then, if ghosts are edible, they are worth more AND remove the ghost from play temporarily.
-- Finally, if there are no ghosts of concern, keep eating as standard.
+    - If an enemy is about to spawn as we pass the lair, we'll die.
+    - Getting caught by a ghost removes one of only a handful of lives, so surviving is the most important part.
+    - Then, if ghosts are edible, they are worth more AND remove the ghost from play temporarily.
+    - Finally, if there are no ghosts of concern, keep eating as standard.
  */
 
 public class WillStoltonPacman extends Controller<MOVE> {
@@ -83,27 +83,17 @@ public class WillStoltonPacman extends Controller<MOVE> {
                     } catch (Exception ignored){
                         // no need to set routeFound to false as it already is.
                     }
-                    if(routeFound){
-                        return chosenMove;
-                    }
-                    else{
-                        return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.PATH);
-                    }
                 }
                 // If there is a clear path to a pill while being chased, take that
                 else{
                     routeFound = isRouteFound(game, msPLocation, ghosts, allEdibles, count, routeFound);
-                    if (routeFound) {
-                        return chosenMove;
-                    }
-                    else{
-                        return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.PATH);
-                    }
                 }
-                // If there is no edible ghost being chased, just move away
-//                else{
-//                    return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.PATH);
-//                }
+                if(routeFound){
+                    return chosenMove;
+                }
+                else{
+                    return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.PATH);
+                }
             }
         }
 
@@ -141,6 +131,17 @@ public class WillStoltonPacman extends Controller<MOVE> {
         }
     }
 
+
+    /**
+     * Determines if a route has been found
+     * @param game game object
+     * @param msPLocation Location of ms pacman
+     * @param ghosts array of ghosts
+     * @param allEdibles array of edibles
+     * @param count count iterator
+     * @param routeFound boolean for route found(true) or not found(false)
+     * @return
+     */
     private boolean isRouteFound(Game game, int msPLocation, GHOST[] ghosts, int[] allEdibles, int count, boolean routeFound) {
         while (count < allEdibles.length) {
             int[] ediblesTrun = Arrays.copyOfRange(allEdibles, count, allEdibles.length);
@@ -369,8 +370,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
         for (int i = 0; i < pSize; i++) {
             allEdibles[i + gSize + ppSize] = pills.get(i);
         }
-
-
         return allEdibles;
     }
 }

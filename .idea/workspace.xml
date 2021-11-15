@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pacman/Executor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/Executor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pacman/game/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/game/Constants.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,7 +96,7 @@
       <workItem from="1634737017388" duration="8168000" />
       <workItem from="1635348572782" duration="8552000" />
       <workItem from="1635375444308" duration="5995000" />
-      <workItem from="1636983371853" duration="9777000" />
+      <workItem from="1636983371853" duration="11612000" />
     </task>
     <task id="LOCAL-00001" summary="dvssdb">
       <created>1635348600646</created>
@@ -283,7 +280,14 @@
       <option name="project" value="LOCAL" />
       <updated>1636678637844</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="working on something that seems to be working again">
+      <created>1636994080111</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1636994080111</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -318,29 +322,38 @@
     <MESSAGE value="trying something&#10;&#10;Also execute still broken" />
     <MESSAGE value="Might be onto something. &#10;&#10;Store the current target node persistently somehow?" />
     <MESSAGE value="Seem to have gotten something to work right" />
-    <option name="LAST_COMMIT_MESSAGE" value="Seem to have gotten something to work right" />
+    <MESSAGE value="working on something that seems to be working again" />
+    <option name="LAST_COMMIT_MESSAGE" value="working on something that seems to be working again" />
   </component>
   <component name="WindowStateProjectService">
     <state x="808" y="404" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1636983391091">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
     <state x="808" y="404" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636983391091" />
-    <state width="340" height="904" key="GridCell.Tab.0.bottom" timestamp="1636993973791">
+    <state x="516" y="110" key="CommitChangelistDialog2" timestamp="1636994078503">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="340" height="904" key="GridCell.Tab.0.bottom/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636993973791" />
-    <state width="340" height="904" key="GridCell.Tab.0.center" timestamp="1636993973791">
+    <state x="516" y="110" key="CommitChangelistDialog2/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636994078503" />
+    <state width="340" height="904" key="GridCell.Tab.0.bottom" timestamp="1636995579789">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="340" height="904" key="GridCell.Tab.0.center/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636993973791" />
-    <state width="340" height="904" key="GridCell.Tab.0.left" timestamp="1636993973791">
+    <state width="340" height="904" key="GridCell.Tab.0.bottom/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636995579789" />
+    <state width="340" height="904" key="GridCell.Tab.0.center" timestamp="1636995579789">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="340" height="904" key="GridCell.Tab.0.left/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636993973791" />
-    <state width="340" height="904" key="GridCell.Tab.0.right" timestamp="1636993973791">
+    <state width="340" height="904" key="GridCell.Tab.0.center/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636995579789" />
+    <state width="340" height="904" key="GridCell.Tab.0.left" timestamp="1636995579789">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="340" height="904" key="GridCell.Tab.0.right/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636993973791" />
+    <state width="340" height="904" key="GridCell.Tab.0.left/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636995579789" />
+    <state width="340" height="904" key="GridCell.Tab.0.right" timestamp="1636995579789">
+      <screen x="0" y="0" width="1920" height="1032" />
+    </state>
+    <state width="340" height="904" key="GridCell.Tab.0.right/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636995579789" />
+    <state x="552" y="248" key="Vcs.Push.Dialog.v2" timestamp="1636994081923">
+      <screen x="0" y="0" width="1920" height="1032" />
+    </state>
+    <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636994081923" />
     <state x="690" y="281" key="extract.method.dialog" timestamp="1636993660673">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
