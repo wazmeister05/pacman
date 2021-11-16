@@ -4,6 +4,7 @@
     <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pacman/game/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/game/Constants.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,6 +73,17 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Executor" />
@@ -82,7 +94,7 @@
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -97,6 +109,7 @@
       <workItem from="1635348572782" duration="8552000" />
       <workItem from="1635375444308" duration="5995000" />
       <workItem from="1636983371853" duration="11612000" />
+      <workItem from="1637021616219" duration="13305000" />
     </task>
     <task id="LOCAL-00001" summary="dvssdb">
       <created>1635348600646</created>
@@ -291,20 +304,19 @@
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="dvssdb" />
@@ -324,40 +336,6 @@
     <MESSAGE value="Seem to have gotten something to work right" />
     <MESSAGE value="working on something that seems to be working again" />
     <option name="LAST_COMMIT_MESSAGE" value="working on something that seems to be working again" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="808" y="404" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1636983391091">
-      <screen x="0" y="0" width="1920" height="1032" />
-    </state>
-    <state x="808" y="404" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636983391091" />
-    <state x="516" y="110" key="CommitChangelistDialog2" timestamp="1636994078503">
-      <screen x="0" y="0" width="1920" height="1032" />
-    </state>
-    <state x="516" y="110" key="CommitChangelistDialog2/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636994078503" />
-    <state width="340" height="904" key="GridCell.Tab.0.bottom" timestamp="1636995579789">
-      <screen x="0" y="0" width="1920" height="1032" />
-    </state>
-    <state width="340" height="904" key="GridCell.Tab.0.bottom/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636995579789" />
-    <state width="340" height="904" key="GridCell.Tab.0.center" timestamp="1636995579789">
-      <screen x="0" y="0" width="1920" height="1032" />
-    </state>
-    <state width="340" height="904" key="GridCell.Tab.0.center/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636995579789" />
-    <state width="340" height="904" key="GridCell.Tab.0.left" timestamp="1636995579789">
-      <screen x="0" y="0" width="1920" height="1032" />
-    </state>
-    <state width="340" height="904" key="GridCell.Tab.0.left/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636995579789" />
-    <state width="340" height="904" key="GridCell.Tab.0.right" timestamp="1636995579789">
-      <screen x="0" y="0" width="1920" height="1032" />
-    </state>
-    <state width="340" height="904" key="GridCell.Tab.0.right/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636995579789" />
-    <state x="552" y="248" key="Vcs.Push.Dialog.v2" timestamp="1636994081923">
-      <screen x="0" y="0" width="1920" height="1032" />
-    </state>
-    <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636994081923" />
-    <state x="690" y="281" key="extract.method.dialog" timestamp="1636993660673">
-      <screen x="0" y="0" width="1920" height="1032" />
-    </state>
-    <state x="690" y="281" key="extract.method.dialog/0.0.1920.1032/-1280.45.1280.976@0.0.1920.1032" timestamp="1636993660673" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
