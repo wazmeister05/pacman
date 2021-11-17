@@ -72,7 +72,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 // Ghost needs to be closer than this (sweet spot).
                 // If there is and edible ghost, chase them if possible.
                 if(ghostTarget != null){
-                    routeFound = false;
                     try{
                         routeFound = check(ghostTarget, game);
                     } catch (Exception ignored){
@@ -121,8 +120,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
 //            return game.getNextMoveTowardsTarget(msPLocation,
 //                    game.getClosestNodeIndexFromNodeIndex(msPLocation, allEdibles, DM.PATH),
 //                    DM.PATH);
-            MOVE move = tryMe(game.copy(), msPLocation);
-            return move;
+            return tryMe(game.copy(), msPLocation);
         }
     }
 
@@ -155,7 +153,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
     }
 
 
-
     /**
      * Determines if a route has been found
      * @param game game object
@@ -179,6 +176,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
             count++;
         }
+        System.out.println(routeFound);
         return routeFound;
     }
 
@@ -207,7 +205,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         // if no ghost in the way
         if (!youShallNotPass) {
             GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, target));
-            chosenMove = game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), target, DM.PATH);
+            chosenMove = game.getNextMoveTowardsTarget(msPLocation, target, DM.PATH);
             return true;
         }
         return false;
@@ -224,7 +222,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
         int target = game.getGhostCurrentNodeIndex(ghostToEat);
         int msPLocation = game.getPacmanCurrentNodeIndex();
         int[] path = game.getShortestPath(game.getPacmanCurrentNodeIndex(), target);
-
         boolean youShallNotPass = false;
         for (int i = 0; (i < path.length) && !youShallNotPass; i++) {
             for (GHOST ghost : GHOST.values()) {
@@ -237,7 +234,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         // if no ghost in the way
         if (!youShallNotPass) {
             GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, target));
-            chosenMove = game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), target, DM.PATH);
+            chosenMove = game.getNextMoveTowardsTarget(msPLocation, target, DM.PATH);
             return true;
         }
         return false;
