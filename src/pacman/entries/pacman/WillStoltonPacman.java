@@ -48,7 +48,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         // buildTree(msPLocation, game);
         int[] allEdibles = getAllEdibles(game);
 
-        if(ghostTarget != null && game.wasGhostEaten(ghostTarget)){
+        if(ghostTarget != null && game.wasGhostEaten(ghostTarget) && !game.wasPacManEaten()){
             ghostTarget = null;
         }
         Map<GHOST, Integer> edible = new HashMap<>();
@@ -118,32 +118,35 @@ public class WillStoltonPacman extends Controller<MOVE> {
     }
 
 
-    private MOVE tryMe(Game game, int msPLocation){
-        Map<Integer, MOVE> scoreAndRoute = new HashMap<>();
+    private int[] tryMe(Game game, int msPLocation){
+        Map<Integer, int[]> scoreAndRoute = new HashMap<>();
         int counter = 0;
         RandomPacMan rpm = new RandomPacMan();
         for(MOVE move : game.getPossibleMoves(msPLocation)){
+            int[] path = new int[500];
             Game future = game.copy();
             counter = Integer.MIN_VALUE;
             int round = 0;
-            boolean eaten = false;
-            while (round != 1000) {
+            while (round != 500) {
                 if(future.wasPacManEaten()){
-                    eaten = true;
                     break;
                 }
+                path[round] = future.getPacmanCurrentNodeIndex();
                 round += 1;
                 counter = counter + future.getScore();
-                future.updatePacMan(rpm.getMove(future, System.currentTimeMillis()));
+                if(round == 0){
+                    future.updatePacMan(move);
+                }
+                else {
+                    future.updatePacMan(rpm.getMove(future, System.currentTimeMillis()));
+                }
                 future.updateGame();
             }
-            if(!eaten) {
-                scoreAndRoute.put(future.getScore(), move);
+                scoreAndRoute.put(future.getScore(), path);
                 int temp = future.getScore();
                 if (temp > counter) {
                     counter = temp;
                 }
-            }
         }
         return scoreAndRoute.get(counter);
     }
@@ -177,7 +180,8 @@ public class WillStoltonPacman extends Controller<MOVE> {
             return true;
         }
         else{
-            chosenMove = tryMe(game, msPLocation);
+            int[] chosenRoute = tryMe(game, msPLocation);
+            chosenMove = game.getNextMoveTowardsTarget(msPLocation, chosenRoute[0], DM.PATH);
         }
         return false;
     }
@@ -209,7 +213,8 @@ public class WillStoltonPacman extends Controller<MOVE> {
             return true;
         }
         else{
-            chosenMove = tryMe(game, msPLocation);
+            int[] chosenRoute = tryMe(game, msPLocation);
+            chosenMove = game.getNextMoveTowardsTarget(msPLocation, chosenRoute[0], DM.PATH);
             return false;
         }
     }

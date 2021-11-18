@@ -3,8 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pacman/Executor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/Executor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pacman/game/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/game/Constants.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,7 +109,7 @@
       <workItem from="1635348572782" duration="8552000" />
       <workItem from="1635375444308" duration="5995000" />
       <workItem from="1636983371853" duration="11612000" />
-      <workItem from="1637021616219" duration="32764000" />
+      <workItem from="1637021616219" duration="35912000" />
     </task>
     <task id="LOCAL-00001" summary="dvssdb">
       <created>1635348600646</created>
@@ -314,7 +314,14 @@
       <option name="project" value="LOCAL" />
       <updated>1637188503388</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Pre-implementing a big change">
+      <created>1637250979896</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1637250979896</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -349,7 +356,8 @@
     <MESSAGE value="Might be onto something. &#10;&#10;Store the current target node persistently somehow?" />
     <MESSAGE value="Seem to have gotten something to work right" />
     <MESSAGE value="working on something that seems to be working again" />
-    <option name="LAST_COMMIT_MESSAGE" value="working on something that seems to be working again" />
+    <MESSAGE value="Pre-implementing a big change" />
+    <option name="LAST_COMMIT_MESSAGE" value="Pre-implementing a big change" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
