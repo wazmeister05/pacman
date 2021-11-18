@@ -10,6 +10,8 @@ import pacman.game.GameView;
 import java.awt.*;
 import java.util.*;
 
+import static pacman.game.Constants.DELAY;
+
 
 /**
 The brief suggests trying to implement simple rules first.
@@ -64,7 +66,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
         }
 
-        int count = 0;
         boolean routeFound = false;
         // If there is a closest ghost, run away from it. But consider edible ghosts.
         for (Map.Entry<GHOST, Integer> entry : inedible.entrySet()) {
@@ -80,14 +81,14 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 }
                 // If there is a clear path to a pill while being chased, take that
                 else{
-                    routeFound = isRouteFound(game, msPLocation, ghosts, allEdibles, count, routeFound);
+                    routeFound = check(game, allEdibles, msPLocation, ghosts);
                 }
                 if(routeFound){
                     return chosenMove;
                 }
                 // otherwise, just run away. But we need to consider other ghosts at the same time.
                 else{
-                    return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.PATH);
+                    return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.EUCLID);
                 }
             }
         }
@@ -112,72 +113,39 @@ public class WillStoltonPacman extends Controller<MOVE> {
         }
 
         // Finally, if there are no edible ghosts and no immediately concerning ghosts, look at the pills.
-        int i = 0;
-        routeFound = isRouteFound(game, msPLocation, ghosts, allEdibles, i, false);
-        if (routeFound) {
-            return chosenMove;
-        } else {
-//            return game.getNextMoveTowardsTarget(msPLocation,
-//                    game.getClosestNodeIndexFromNodeIndex(msPLocation, allEdibles, DM.PATH),
-//                    DM.PATH);
-            return tryMe(game.copy(), msPLocation);
-        }
+        check(game, allEdibles, msPLocation, ghosts);
+        return chosenMove;
     }
 
 
-    private MOVE tryMe(Game gameCopy, int msPLocation){
+    private MOVE tryMe(Game game, int msPLocation){
         Map<Integer, MOVE> scoreAndRoute = new HashMap<>();
         int counter = 0;
-        for(int i = 0; i < gameCopy.getPossibleMoves(msPLocation).length; i++) {
-            int[] path = new int[100];
+        RandomPacMan rpm = new RandomPacMan();
+        for(MOVE move : game.getPossibleMoves(msPLocation)){
+            Game future = game.copy();
+            counter = Integer.MIN_VALUE;
             int round = 0;
-            MOVE move = null;
-            while (round != 99) {
-                if(round == 0) {
-                    move = gameCopy.getPacmanLastMoveMade();
-                }
-                if(gameCopy.wasPacManEaten()){
+            boolean eaten = false;
+            while (round != 1000) {
+                if(future.wasPacManEaten()){
+                    eaten = true;
                     break;
                 }
-                path[round] = gameCopy.getPacmanCurrentNodeIndex();
                 round += 1;
-                gameCopy.updateGame();
+                counter = counter + future.getScore();
+                future.updatePacMan(rpm.getMove(future, System.currentTimeMillis()));
+                future.updateGame();
             }
-            scoreAndRoute.put(gameCopy.getScore(), move);
-            int temp = gameCopy.getScore();
-            if(temp > counter){
-                counter = temp;
+            if(!eaten) {
+                scoreAndRoute.put(future.getScore(), move);
+                int temp = future.getScore();
+                if (temp > counter) {
+                    counter = temp;
+                }
             }
         }
         return scoreAndRoute.get(counter);
-    }
-
-
-    /**
-     * Determines if a route has been found
-     * @param game game object
-     * @param msPLocation Location of ms pacman
-     * @param ghosts array of ghosts
-     * @param allEdibles array of edibles
-     * @param count count iterator
-     * @param routeFound boolean for route found(true) or not found(false)
-     * @return
-     */
-    private boolean isRouteFound(Game game, int msPLocation, GHOST[] ghosts, int[] allEdibles, int count, boolean routeFound) {
-        while (count < allEdibles.length) {
-            int[] ediblesTrun = Arrays.copyOfRange(allEdibles, count, allEdibles.length);
-            try {
-                routeFound = check(game, ediblesTrun, msPLocation, ghosts);
-            } catch (Exception e) {
-                routeFound = false;
-            }
-            if (routeFound) {
-                break;
-            }
-            count++;
-        }
-        System.out.println(routeFound);
-        return routeFound;
     }
 
 
@@ -208,6 +176,9 @@ public class WillStoltonPacman extends Controller<MOVE> {
             chosenMove = game.getNextMoveTowardsTarget(msPLocation, target, DM.PATH);
             return true;
         }
+        else{
+            chosenMove = tryMe(game, msPLocation);
+        }
         return false;
     }
 
@@ -237,7 +208,10 @@ public class WillStoltonPacman extends Controller<MOVE> {
             chosenMove = game.getNextMoveTowardsTarget(msPLocation, target, DM.PATH);
             return true;
         }
-        return false;
+        else{
+            chosenMove = tryMe(game, msPLocation);
+            return false;
+        }
     }
 
 
