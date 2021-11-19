@@ -1,6 +1,7 @@
 package pacman.entries.pacman;
 
 import pacman.controllers.Controller;
+import pacman.controllers.examples.Legacy;
 import pacman.controllers.examples.RandomPacMan;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.DM;
@@ -9,9 +10,6 @@ import pacman.game.Game;
 import pacman.game.GameView;
 import java.awt.*;
 import java.util.*;
-
-import static pacman.game.Constants.DELAY;
-
 
 /**
 The brief suggests trying to implement simple rules first.
@@ -28,8 +26,7 @@ Why?
 
 public class WillStoltonPacman extends Controller<MOVE> {
 
-    private Tree tree;
-    private Set<Integer> visited;
+
     private GHOST ghostTarget;
     private MOVE chosenMove;
 
@@ -45,7 +42,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
         // We'll need these throughout so make them now.
         int msPLocation = game.getPacmanCurrentNodeIndex();
         GHOST[] ghosts = GHOST.values();
-        // buildTree(msPLocation, game);
         int[] allEdibles = getAllEdibles(game);
 
         if(ghostTarget != null && game.wasGhostEaten(ghostTarget) && !game.wasPacManEaten()){
@@ -118,16 +114,16 @@ public class WillStoltonPacman extends Controller<MOVE> {
     }
 
 
-    private int[] tryMe(Game game, int msPLocation){
+    private int[] sim(Game game, int msPLocation){
         Map<Integer, int[]> scoreAndRoute = new HashMap<>();
         int counter = 0;
         RandomPacMan rpm = new RandomPacMan();
         for(MOVE move : game.getPossibleMoves(msPLocation)){
-            int[] path = new int[500];
+            int[] path = new int[100];
             Game future = game.copy();
             counter = Integer.MIN_VALUE;
             int round = 0;
-            while (round != 500) {
+            while (round != 100) {
                 if(future.wasPacManEaten()){
                     break;
                 }
@@ -135,18 +131,18 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 round += 1;
                 counter = counter + future.getScore();
                 if(round == 0){
-                    future.updatePacMan(move);
+                    future.advanceGame(move, new Legacy().getMove());
                 }
                 else {
-                    future.updatePacMan(rpm.getMove(future, System.currentTimeMillis()));
+                    future.advanceGame(rpm.getMove(future, System.currentTimeMillis()), new Legacy().getMove());
                 }
                 future.updateGame();
             }
-                scoreAndRoute.put(future.getScore(), path);
-                int temp = future.getScore();
-                if (temp > counter) {
-                    counter = temp;
-                }
+            scoreAndRoute.put(future.getScore(), path);
+            int temp = future.getScore();
+            if (temp > counter) {
+                counter = temp;
+            }
         }
         return scoreAndRoute.get(counter);
     }
@@ -180,7 +176,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
             return true;
         }
         else{
-            int[] chosenRoute = tryMe(game, msPLocation);
+            int[] chosenRoute = sim(game, msPLocation);
             chosenMove = game.getNextMoveTowardsTarget(msPLocation, chosenRoute[0], DM.PATH);
         }
         return false;
@@ -213,7 +209,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
             return true;
         }
         else{
-            int[] chosenRoute = tryMe(game, msPLocation);
+            int[] chosenRoute = sim(game, msPLocation);
             chosenMove = game.getNextMoveTowardsTarget(msPLocation, chosenRoute[0], DM.PATH);
             return false;
         }
@@ -293,60 +289,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
         }
         return ghosts;
     }
-
-
-    /**
-     * Create the root node and begin building the tree
-     *
-     * @param msPLocation index of mrs p
-     * @param game        game object
-     */
-    private void buildTree(int msPLocation, Game game) {
-        tree = new Tree();
-        Node root = new Node(msPLocation);
-        tree.setRoot(root);
-        visited = new HashSet<>();
-        ArrayList<Integer> ghosts = nonEdibleGhosts(game);
-        ArrayList<Integer> edibleGhosts = edibleGhosts(game);
-        ArrayList<Integer> pills = pills(game);
-        ArrayList<Integer> powerPills = powerPills(game);
-        buildTree(root, game, ghosts, edibleGhosts, pills, powerPills);
-    }
-
-
-    /**
-     * Continue to build the tree after having added the root
-     *
-     * @param parent     parent node object
-     * @param game       game object
-     * @param ghosts     list of ghost locations
-     * @param pills      list of pill locations
-     * @param powerPills list of powerpill locations
-     */
-    private void buildTree(Node parent, Game game, ArrayList<Integer> ghosts, ArrayList<Integer> edibleGhosts, ArrayList<Integer> pills, ArrayList<Integer> powerPills) {
-        int index = parent.getIndex();
-        if (!visited.contains(index)) {
-            visited.add(index);
-            if (ghosts.contains(index)) {
-                parent.setScore(-200);
-            } else if (edibleGhosts.contains(index)) {
-                parent.setScore(200);
-            } else if (powerPills.contains(index)) {
-                parent.setScore(50);
-            } else if (pills.contains(index)) {
-                parent.setScore(10);
-            } else {
-                parent.setScore(1);
-            }
-            int[] children = game.getNeighbouringNodes(index);
-            for (int child : children) {
-                Node newNode = new Node(child);
-                parent.addChild(newNode);
-                buildTree(newNode, game, ghosts, edibleGhosts, pills, powerPills);
-            }
-        }
-    }
-
 
     /**
      * @param game game object

@@ -3,14 +3,14 @@ package pacman.entries.pacman;
  Tree class for making the moves tree
  */
 
-public class Tree {
+public class Graph {
     private Node root;
 
 
     /**
      * Tree constructor
      */
-    Tree() {
+    Graph() {
     }
 
     /**
