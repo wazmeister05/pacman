@@ -55,7 +55,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
             if (game.getGhostLairTime(ghost) == 0) {
                 int ghostIndex = game.getGhostCurrentNodeIndex(ghost);
                 if (!game.isGhostEdible(ghost)) {
-                    inedible.put(ghost, game.getShortestPathDistance(ghostIndex, msPLocation));
+                    inedible.put(ghost, (int)game.getEuclideanDistance(ghostIndex, msPLocation));
                 } else {
                     edible.put(ghost, game.getShortestPathDistance(ghostIndex, msPLocation));
                 }
@@ -65,7 +65,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         boolean routeFound = false;
         // If there is a closest ghost, run away from it. But consider edible ghosts.
         for (Map.Entry<GHOST, Integer> entry : inedible.entrySet()) {
-            if (entry.getValue() <= 10) {
+            if (entry.getValue() <= 5) {
                 // Ghost needs to be closer than this (sweet spot).
                 // If there is and edible ghost, chase them if possible.
                 if(ghostTarget != null){
@@ -82,7 +82,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 if(routeFound){
                     return chosenMove;
                 }
-                // otherwise, just run away. But we need to consider other ghosts at the same time.
+                // otherwise, just run away.
                 else{
                     return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.EUCLID);
                 }
@@ -114,37 +114,49 @@ public class WillStoltonPacman extends Controller<MOVE> {
     }
 
 
-    private int[] sim(Game game, int msPLocation){
-        Map<Integer, int[]> scoreAndRoute = new HashMap<>();
+    private MOVE sim(Game game, int msPLocation){
+        Map<Boolean, MOVE> scoreAndRoute = new HashMap<>();
         int counter = 0;
+        MOVE returnThis = null;
+        final int SIZE = 1000;
         RandomPacMan rpm = new RandomPacMan();
+        int lives = game.getPacmanNumberOfLivesRemaining();
         for(MOVE move : game.getPossibleMoves(msPLocation)){
-            int[] path = new int[100];
+            int[] path = new int[SIZE];
             Game future = game.copy();
             counter = Integer.MIN_VALUE;
+            boolean dead = false;
             int round = 0;
-            while (round != 100) {
-                if(future.wasPacManEaten()){
+            while (round != SIZE) {
+                if(future.getPacmanNumberOfLivesRemaining() < lives){
+                    dead = true;
                     break;
                 }
-                path[round] = future.getPacmanCurrentNodeIndex();
-                round += 1;
-                counter = counter + future.getScore();
-                if(round == 0){
-                    future.advanceGame(move, new Legacy().getMove());
+                else if(round == SIZE-1){
+                    path[round] = future.getPacmanCurrentNodeIndex();
+                    break;
                 }
                 else {
-                    future.advanceGame(rpm.getMove(future, System.currentTimeMillis()), new Legacy().getMove());
+                    path[round] = future.getPacmanCurrentNodeIndex();
+                    round += 1;
+                    counter = counter + future.getScore();
+                    if (round == 0) {
+                        future.advanceGame(move, new Legacy().getMove());
+                    } else {
+                        future.advanceGame(rpm.getMove(future, System.currentTimeMillis()), new Legacy().getMove());
+                    }
+                    future.updateGame();
                 }
-                future.updateGame();
             }
-            scoreAndRoute.put(future.getScore(), path);
-            int temp = future.getScore();
-            if (temp > counter) {
-                counter = temp;
+            scoreAndRoute.put(dead, move);
+        }
+
+        for(Map.Entry<Boolean, MOVE> entry : scoreAndRoute.entrySet()){
+            if(!entry.getKey()){
+                returnThis = entry.getValue();
             }
         }
-        return scoreAndRoute.get(counter);
+        return returnThis;
     }
 
 
@@ -170,16 +182,15 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
         }
         // if no ghost in the way
-        if (!youShallNotPass) {
+        if(!youShallNotPass){
             GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, target));
             chosenMove = game.getNextMoveTowardsTarget(msPLocation, target, DM.PATH);
             return true;
         }
-        else{
-            int[] chosenRoute = sim(game, msPLocation);
-            chosenMove = game.getNextMoveTowardsTarget(msPLocation, chosenRoute[0], DM.PATH);
+        else {
+            chosenMove = sim(game, msPLocation);
+            return false;
         }
-        return false;
     }
 
 
@@ -203,14 +214,13 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
         }
         // if no ghost in the way
-        if (!youShallNotPass) {
+        if(!youShallNotPass){
             GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, target));
             chosenMove = game.getNextMoveTowardsTarget(msPLocation, target, DM.PATH);
             return true;
         }
         else{
-            int[] chosenRoute = sim(game, msPLocation);
-            chosenMove = game.getNextMoveTowardsTarget(msPLocation, chosenRoute[0], DM.PATH);
+            chosenMove = sim(game, msPLocation);
             return false;
         }
     }
