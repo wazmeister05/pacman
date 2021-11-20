@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -320,7 +319,14 @@
       <option name="project" value="LOCAL" />
       <updated>1637331393772</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="trying something drastic before goign back to Advance branch">
+      <created>1637408423810</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1637408423810</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

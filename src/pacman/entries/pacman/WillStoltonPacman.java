@@ -63,42 +63,12 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-//        // If there is a closest ghost, run away from it. But consider edible ghosts.
-//        for (Map.Entry<GHOST, Integer> entry : inedible.entrySet()) {
-//            if (entry.getValue() <= 5) {
-//                // Ghost needs to be closer than this (sweet spot).
-//                // If there is and edible ghost, chase them if possible.
-//                if(ghostTarget != null){
-//                    try{
-//                        routeFound = check(ghostTarget, game);
-//                    } catch (Exception ignored){
-//                        // no need to set routeFound to false as it already is.
-//                    }
-//                }
-//                // If there is a clear path to a pill while being chased, take that
-//                else{
-//                    routeFound = check(game, allEdibles, msPLocation, ghosts);
-//                }
-//                if(routeFound){
-//                    return chosenMove;
-//                }
-//                // otherwise, just run away.
-//                else{
-//                    return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.EUCLID);
-//                }
-//            }
-//        }
-
+        // If there is a closest ghost, run away from it. But consider edible ghosts.
+        for (Map.Entry<GHOST, Integer> entry : inedible.entrySet()) {
+            if (entry.getValue() <= 10) {
+                return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.EUCLID);
+            }
+        }
 
         return sim(game, msPLocation, ghosts, allEdibles, edible, inedible);
     }
