@@ -40,17 +40,82 @@ public class WillStoltonPacman extends Controller<MOVE> {
      */
     public MOVE getMove(Game game, long timeDue) {
         // We'll need these throughout so make them now.
+
+        if(ghostTarget != null && game.wasGhostEaten(ghostTarget) && !game.wasPacManEaten()){
+            ghostTarget = null;
+        }
         int msPLocation = game.getPacmanCurrentNodeIndex();
         GHOST[] ghosts = GHOST.values();
         int[] allEdibles = getAllEdibles(game);
 
-        return sim(game, msPLocation, ghosts, allEdibles);
+        Map<GHOST, Integer> edible = new HashMap<>();
+        Map<GHOST, Integer> inedible = new HashMap<>();
+
+        // Determine if ghost is edible or inedible and assign it so.
+        for (GHOST ghost : ghosts) {
+            if (game.getGhostLairTime(ghost) == 0) {
+                int ghostIndex = game.getGhostCurrentNodeIndex(ghost);
+                if (!game.isGhostEdible(ghost)) {
+                    inedible.put(ghost, (int)game.getEuclideanDistance(ghostIndex, msPLocation));
+                } else {
+                    edible.put(ghost, game.getShortestPathDistance(ghostIndex, msPLocation));
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+//        // If there is a closest ghost, run away from it. But consider edible ghosts.
+//        for (Map.Entry<GHOST, Integer> entry : inedible.entrySet()) {
+//            if (entry.getValue() <= 5) {
+//                // Ghost needs to be closer than this (sweet spot).
+//                // If there is and edible ghost, chase them if possible.
+//                if(ghostTarget != null){
+//                    try{
+//                        routeFound = check(ghostTarget, game);
+//                    } catch (Exception ignored){
+//                        // no need to set routeFound to false as it already is.
+//                    }
+//                }
+//                // If there is a clear path to a pill while being chased, take that
+//                else{
+//                    routeFound = check(game, allEdibles, msPLocation, ghosts);
+//                }
+//                if(routeFound){
+//                    return chosenMove;
+//                }
+//                // otherwise, just run away.
+//                else{
+//                    return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.EUCLID);
+//                }
+//            }
+//        }
+
+
+        return sim(game, msPLocation, ghosts, allEdibles, edible, inedible);
     }
 
 
-    private MOVE sim(Game game, int msPLocation, GHOST[] ghosts, int[] allEdibles){
+    private MOVE sim(Game game, int msPLocation, GHOST[] ghosts, int[] allEdibles, Map<GHOST, Integer> edible, Map<GHOST, Integer> inedible){
         Map<Integer, MOVE> scoreAndRoute = new HashMap<>();
         int counter = Integer.MIN_VALUE;
+        ArrayList<GHOST> buffet = new ArrayList<>();
+        int distance = Integer.MAX_VALUE;
+        for (Map.Entry<GHOST, Integer> entry : edible.entrySet()) {
+            int currentGhostDistance = entry.getValue();
+            if (currentGhostDistance <= 100 && currentGhostDistance < distance) {
+                buffet.add(entry.getKey());
+                distance = currentGhostDistance;
+            }
+        }
         MOVE returnThis = null;
         final int SIZE = 1000;
         RandomPacMan rpm = new RandomPacMan();
@@ -79,8 +144,18 @@ public class WillStoltonPacman extends Controller<MOVE> {
                         }
                     }
                 }
-                if (check(game, path, msPLocation, ghosts)) {
+                for(Integer entry:path){
+                    if(edible.containsValue(entry)){
+                        counter = counter + 20000;
+                    }
+                }
+
+                if (!check(game, path, msPLocation, ghosts)) {
                     scoreAndRoute.put(counter, move);
+                    routeFound = true;
+                }
+                else{
+                    scoreAndRoute.put(counter - 20000, move);
                     routeFound = true;
                 }
             }
@@ -117,7 +192,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 }
             }
         }
-        return true;
+        return youShallNotPass;
     }
 
 
