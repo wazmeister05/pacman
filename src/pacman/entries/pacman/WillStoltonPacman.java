@@ -44,143 +44,54 @@ public class WillStoltonPacman extends Controller<MOVE> {
         GHOST[] ghosts = GHOST.values();
         int[] allEdibles = getAllEdibles(game);
 
-        if(ghostTarget != null && game.wasGhostEaten(ghostTarget) && !game.wasPacManEaten()){
-            ghostTarget = null;
-        }
-        Map<GHOST, Integer> edible = new HashMap<>();
-        Map<GHOST, Integer> inedible = new HashMap<>();
-
-        // Determine if ghost is edible or inedible and assign it so.
-        for (GHOST ghost : ghosts) {
-            if (game.getGhostLairTime(ghost) == 0) {
-                int ghostIndex = game.getGhostCurrentNodeIndex(ghost);
-                if (!game.isGhostEdible(ghost)) {
-                    inedible.put(ghost, game.getShortestPathDistance(ghostIndex, msPLocation));
-                } else {
-                    edible.put(ghost, game.getShortestPathDistance(ghostIndex, msPLocation));
-                }
-            }
-        }
-
-        boolean routeFound = false;
-        // If there is a closest ghost, run away from it. But consider edible ghosts.
-        for (Map.Entry<GHOST, Integer> entry : inedible.entrySet()) {
-            if (entry.getValue() <= 10) {
-                // Ghost needs to be closer than this (sweet spot).
-                // If there is and edible ghost, chase them if possible.
-                if(ghostTarget != null){
-                    try{
-                        routeFound = check(ghostTarget, game);
-                    } catch (Exception ignored){
-                        // no need to set routeFound to false as it already is.
-                    }
-                }
-                // If there is a clear path to a pill while being chased, take that
-                else{
-                    routeFound = check(game, allEdibles, msPLocation, ghosts);
-                }
-                if(routeFound){
-                    return chosenMove;
-                }
-                // otherwise, just run away. But we need to consider other ghosts at the same time.
-                else{
-                    return game.getNextMoveAwayFromTarget(msPLocation, game.getGhostCurrentNodeIndex(entry.getKey()), DM.EUCLID);
-                }
-            }
-        }
-
-        // Now look at edible ghosts
-        ArrayList<GHOST> buffet = new ArrayList<>();
-        int distance = Integer.MAX_VALUE;
-
-        for (Map.Entry<GHOST, Integer> entry : edible.entrySet()) {
-            int currentGhostDistance = entry.getValue();
-            if (currentGhostDistance <= 100 && currentGhostDistance < distance) {
-                buffet.add(entry.getKey());
-                distance = currentGhostDistance;
-            }
-        }
-        if(buffet.size() > 0) {
-            ghostTarget = buffet.get(buffet.size()-1);
-            routeFound = check(ghostTarget, game);
-            if (routeFound) {
-                return chosenMove;
-            }
-        }
-
-        // Finally, if there are no edible ghosts and no immediately concerning ghosts, look at the pills.
-        check(game, allEdibles, msPLocation, ghosts);
-        return chosenMove;
+        return sim(game, msPLocation, ghosts, allEdibles);
     }
 
 
-    private int[] sim(Game game, int msPLocation){
-        Map<Integer, int[]> scoreAndRoute = new HashMap<>();
+    private MOVE sim(Game game, int msPLocation, GHOST[] ghosts, int[] allEdibles){
+        Map<Boolean, MOVE> scoreAndRoute = new HashMap<>();
         int counter = 0;
+        MOVE returnThis = null;
+        final int SIZE = 100;
         RandomPacMan rpm = new RandomPacMan();
-        for(MOVE move : game.getPossibleMoves(msPLocation)){
-            int[] path = new int[100];
+        int lives = game.getPacmanNumberOfLivesRemaining();
+        for(MOVE move : game.getPossibleMoves(msPLocation, game.getPacmanLastMoveMade())){
+            int[] path = new int[SIZE];
             Game future = game.copy();
             counter = Integer.MIN_VALUE;
+            boolean dead = false;
             int round = 0;
-            while (round != 100) {
-                if(future.wasPacManEaten()){
+            while (round != SIZE) {
+                if(future.getPacmanNumberOfLivesRemaining() == lives-1){
+                    dead = true;
                     break;
                 }
-                path[round] = future.getPacmanCurrentNodeIndex();
-                round += 1;
-                counter = counter + future.getScore();
-                if(round == 0){
-                    future.advanceGame(move, new Legacy().getMove());
+                else if(round == SIZE-1){
+                    path[round] = future.getPacmanCurrentNodeIndex();
+                    break;
                 }
                 else {
-                    future.advanceGame(rpm.getMove(future, System.currentTimeMillis()), new Legacy().getMove());
-                }
-                future.updateGame();
-            }
-            scoreAndRoute.put(future.getScore(), path);
-            int temp = future.getScore();
-            if (temp > counter) {
-                counter = temp;
-            }
-        }
-        return scoreAndRoute.get(counter);
-    }
-
-
-    /**
-     * Confirm route to pill is clear
-     * @param game game object
-     * @param edibles array of edible items
-     * @param msPLocation current location
-     * @param ghosts array of ghosts
-     * @return true if path clear, false if not.
-     */
-    private boolean check(Game game, int[] edibles, int msPLocation, GHOST[] ghosts) {
-        int target = game.getClosestNodeIndexFromNodeIndex(msPLocation, edibles, DM.PATH);
-        int[] path = game.getShortestPath(msPLocation, target);
-
-        boolean youShallNotPass = false;
-        for (int i = 0; (i < path.length) && !youShallNotPass; i++) {
-            for (GHOST ghost : ghosts) {
-                if (path[i] == game.getGhostCurrentNodeIndex(ghost) && !game.isGhostEdible(ghost)) {
-                    youShallNotPass = true;
-                    break;
+                    path[round] = future.getPacmanCurrentNodeIndex();
+                    round += 1;
+                    counter = counter + future.getScore();
+                    if (round == 0) {
+                        future.advanceGame(move, new Legacy().getMove());
+                    } else {
+                        future.advanceGame(rpm.getMove(future, System.currentTimeMillis()), new Legacy().getMove());
+                    }
                 }
             }
+            scoreAndRoute.put(dead, move);
         }
-        // if no ghost in the way
-        if (!youShallNotPass) {
-            GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, target));
-            chosenMove = game.getNextMoveTowardsTarget(msPLocation, target, DM.PATH);
-            return true;
+
+        for(Map.Entry<Boolean, MOVE> entry : scoreAndRoute.entrySet()){
+            if(!entry.getKey()){
+                returnThis = entry.getValue();
+            }
         }
-        else{
-            int[] chosenRoute = sim(game, msPLocation);
-            chosenMove = game.getNextMoveTowardsTarget(msPLocation, chosenRoute[0], DM.PATH);
-        }
-        return false;
+        return returnThis;
     }
+
 
 
     /**
