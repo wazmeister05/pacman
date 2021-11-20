@@ -118,24 +118,24 @@ public class WillStoltonPacman extends Controller<MOVE> {
         Map<Boolean, MOVE> scoreAndRoute = new HashMap<>();
         int counter = 0;
         MOVE returnThis = null;
-        final int SIZE = 1000;
+        final int SIZE = 100;
         RandomPacMan rpm = new RandomPacMan();
         int lives = game.getPacmanNumberOfLivesRemaining();
-        for(MOVE move : game.getPossibleMoves(msPLocation)){
+        for(MOVE move : game.getPossibleMoves(msPLocation, game.getPacmanLastMoveMade())){
             int[] path = new int[SIZE];
             Game future = game.copy();
             counter = Integer.MIN_VALUE;
             boolean dead = false;
             int round = 0;
             while (round != SIZE) {
-                if(future.getPacmanNumberOfLivesRemaining() < lives){
+                if(future.getPacmanNumberOfLivesRemaining() == lives-1){
                     dead = true;
                     break;
                 }
-                else if(round == SIZE-1){
-                    path[round] = future.getPacmanCurrentNodeIndex();
-                    break;
-                }
+//                else if(round == SIZE-1){
+//                    path[round] = future.getPacmanCurrentNodeIndex();
+//                    break;
+//                }
                 else {
                     path[round] = future.getPacmanCurrentNodeIndex();
                     round += 1;
@@ -145,7 +145,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
                     } else {
                         future.advanceGame(rpm.getMove(future, System.currentTimeMillis()), new Legacy().getMove());
                     }
-                    future.updateGame();
                 }
             }
             scoreAndRoute.put(dead, move);
@@ -182,15 +181,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
         }
         // if no ghost in the way
-        if(!youShallNotPass){
-            GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, target));
-            chosenMove = game.getNextMoveTowardsTarget(msPLocation, target, DM.PATH);
-            return true;
-        }
-        else {
-            chosenMove = sim(game, msPLocation);
-            return false;
-        }
+        return ghostFree(game, target, msPLocation, youShallNotPass);
     }
 
 
@@ -214,12 +205,26 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
         }
         // if no ghost in the way
+        return ghostFree(game, target, msPLocation, youShallNotPass);
+    }
+
+
+    /**
+     * set the route to be followed if the path is clear
+     * @param game game object
+     * @param target target node
+     * @param msPLocation Ms P location
+     * @param youShallNotPass boolean
+     * @return true or false
+     */
+    private boolean ghostFree(Game game, int target, int msPLocation, boolean youShallNotPass) {
         if(!youShallNotPass){
             GameView.addPoints(game, Color.MAGENTA, game.getShortestPath(msPLocation, target));
             chosenMove = game.getNextMoveTowardsTarget(msPLocation, target, DM.PATH);
             return true;
         }
         else{
+            // if there is a ghost in the route, simulate a new path
             chosenMove = sim(game, msPLocation);
             return false;
         }
