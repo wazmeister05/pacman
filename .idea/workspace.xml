@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="1f50adf6-d5f1-40c9-a489-1a49f1245c09" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pacman/Executor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/Executor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/Graph.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/Node.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/pacman/entries/pacman/WillStoltonPacman.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

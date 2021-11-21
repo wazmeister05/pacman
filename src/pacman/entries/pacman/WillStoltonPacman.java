@@ -114,9 +114,9 @@ public class WillStoltonPacman extends Controller<MOVE> {
     }
 
 
-    private MOVE sim(Game game, int msPLocation){
-        Map<Boolean, MOVE> scoreAndRoute = new HashMap<>();
-        int counter = 0;
+    private MOVE sim(Game game, int msPLocation, ArrayList<Integer> edible, ArrayList<Integer> power, ArrayList<Integer> pills){
+        Map<Double, MOVE> aliveAndRoute = new HashMap<>();
+        double counter = 0;
         MOVE returnThis = null;
         final int SIZE = 100;
         RandomPacMan rpm = new RandomPacMan();
@@ -124,7 +124,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         for(MOVE move : game.getPossibleMoves(msPLocation, game.getPacmanLastMoveMade())){
             int[] path = new int[SIZE];
             Game future = game.copy();
-            counter = Integer.MIN_VALUE;
+            counter = Double.MIN_VALUE;
             boolean dead = false;
             int round = 0;
             while (round != SIZE) {
@@ -139,7 +139,6 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 else {
                     path[round] = future.getPacmanCurrentNodeIndex();
                     round += 1;
-                    counter = counter + future.getScore();
                     if (round == 0) {
                         future.advanceGame(move, new Legacy().getMove());
                     } else {
@@ -147,12 +146,27 @@ public class WillStoltonPacman extends Controller<MOVE> {
                     }
                 }
             }
-            scoreAndRoute.put(dead, move);
+            for (Integer entry : path) {
+                if (edible.contains(entry)) {
+                    counter = counter * 2;
+                } else if (power.contains(entry)) {
+                    counter = counter * 1.5;
+                } else if (pills.contains(entry)) {
+                    counter = counter * 1.1;
+                } else {
+                    counter = counter + 1;
+                }
+            }
+            if(!dead) {
+                aliveAndRoute.put(counter, move);
+            }
         }
 
-        for(Map.Entry<Boolean, MOVE> entry : scoreAndRoute.entrySet()){
-            if(!entry.getKey()){
+        Double min = Double.MIN_VALUE;
+        for(Map.Entry<Double, MOVE> entry : aliveAndRoute.entrySet()){
+            if(entry.getKey() > min){
                 returnThis = entry.getValue();
+                min = entry.getKey();
             }
         }
         return returnThis;
@@ -225,7 +239,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         }
         else{
             // if there is a ghost in the route, simulate a new path
-            chosenMove = sim(game, msPLocation);
+            chosenMove = sim(game, msPLocation, edibleGhosts(game), powerPills(game), pills(game));
             return false;
         }
     }
