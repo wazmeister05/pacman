@@ -46,7 +46,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
         }
         int msPLocation = game.getPacmanCurrentNodeIndex();
         GHOST[] ghosts = GHOST.values();
-        int[] allEdibles = getAllEdibles(game);
+        //int[] allEdibles = getAllEdibles(game);
 
         Map<GHOST, Integer> edible = new HashMap<>();
         Map<GHOST, Integer> inedible = new HashMap<>();
@@ -70,13 +70,14 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
         }
 
-        return sim(game, msPLocation, ghosts, allEdibles, edible, inedible);
+        return sim(game, msPLocation, ghosts, powerPills(game), pills(game), edible, inedible);
     }
 
 
-    private MOVE sim(Game game, int msPLocation, GHOST[] ghosts, int[] allEdibles, Map<GHOST, Integer> edible, Map<GHOST, Integer> inedible){
-        Map<Integer, MOVE> scoreAndRoute = new HashMap<>();
-        int counter = Integer.MIN_VALUE;
+    private MOVE sim(Game game, int msPLocation, GHOST[] ghosts, ArrayList<Integer> powerPills,
+                     ArrayList<Integer> pills, Map<GHOST, Integer> edible, Map<GHOST, Integer> inedible){
+        Map<Double, MOVE> scoreAndRoute = new HashMap<>();
+        double counter = Integer.MIN_VALUE;
         ArrayList<GHOST> buffet = new ArrayList<>();
         int distance = Integer.MAX_VALUE;
         for (Map.Entry<GHOST, Integer> entry : edible.entrySet()) {
@@ -87,7 +88,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
             }
         }
         MOVE returnThis = null;
-        final int SIZE = 1000;
+        final int SIZE = 100;
         RandomPacMan rpm = new RandomPacMan();
         boolean routeFound = false;
         int lives = game.getPacmanNumberOfLivesRemaining();
@@ -95,10 +96,11 @@ public class WillStoltonPacman extends Controller<MOVE> {
             for(MOVE move : game.getPossibleMoves(msPLocation, game.getPacmanLastMoveMade())) {
                 int[] path = new int[SIZE];
                 Game future = game.copy();
-                counter = Integer.MIN_VALUE;
+                counter = Double.MIN_VALUE;
                 int round = 0;
                 while (round != SIZE) {
                     if (future.getPacmanNumberOfLivesRemaining() == lives - 1) {
+                        path = null;
                         break;
                     } else if (round == SIZE - 1) {
                         path[round] = future.getPacmanCurrentNodeIndex();
@@ -106,33 +108,44 @@ public class WillStoltonPacman extends Controller<MOVE> {
                     } else {
                         path[round] = future.getPacmanCurrentNodeIndex();
                         round += 1;
-                        counter = counter + future.getScore();
                         if (round == 0) {
                             future.advanceGame(move, new Legacy().getMove());
+                        }
+                        else if(buffet.size() > 0){
+                            GHOST ghost = buffet.get(0);
+                            future.advanceGame(future.getNextMoveTowardsTarget(msPLocation, game.getGhostCurrentNodeIndex(ghost),
+                                    future.getPacmanLastMoveMade(), DM.PATH), new Legacy().getMove());
                         } else {
                             future.advanceGame(rpm.getMove(future, System.currentTimeMillis()), new Legacy().getMove());
                         }
                     }
                 }
-                for(Integer entry:path){
-                    if(edible.containsValue(entry)){
-                        counter = counter + 20000;
+                if(path != null) {
+                    for (Integer entry : path) {
+                        if (edible.containsValue(entry)) {
+                            counter = counter * 2;
+                        } else if (powerPills.contains(entry)) {
+                            counter = counter * 1.5;
+                        } else if (pills.contains(entry)) {
+                            counter = counter * 1.1;
+                        } else {
+                            counter = counter + 1;
+                        }
                     }
-                }
 
-                if (!check(game, path, msPLocation, ghosts)) {
-                    scoreAndRoute.put(counter, move);
-                    routeFound = true;
-                }
-                else{
-                    scoreAndRoute.put(counter - 20000, move);
-                    routeFound = true;
+                    if (!check(game, path, msPLocation, ghosts)) {
+                        scoreAndRoute.put(counter, move);
+                        routeFound = true;
+                    } else {
+                        scoreAndRoute.put(Double.MIN_VALUE, move);
+                        routeFound = true;
+                    }
                 }
             }
         }
 
         int temp = Integer.MIN_VALUE;
-        for(Map.Entry<Integer, MOVE> entry : scoreAndRoute.entrySet()){
+        for(Map.Entry<Double, MOVE> entry : scoreAndRoute.entrySet()){
             if(entry.getKey() > temp){
                 returnThis = entry.getValue();
             }
@@ -247,20 +260,23 @@ public class WillStoltonPacman extends Controller<MOVE> {
     private int[] getAllEdibles(Game game) {
         ArrayList<Integer> pills = pills(game);
         ArrayList<Integer> powerPills = powerPills(game);
-        ArrayList<Integer> edibleGhostLocs = edibleGhosts(game);
+        //ArrayList<Integer> edibleGhostLocs = edibleGhosts(game);
         int pSize = pills.size();
         int ppSize = powerPills.size();
-        int gSize = edibleGhostLocs.size();
-        int[] allEdibles = new int[pSize + ppSize + gSize];
+        //int gSize = edibleGhostLocs.size();
+        //int[] allEdibles = new int[pSize + ppSize + gSize];
+        int[] allEdibles = new int[pSize + ppSize];
 
-        for (int i = 0; i < gSize; i++) {
-            allEdibles[i] = edibleGhostLocs.get(i);
-        }
+//        for (int i = 0; i < gSize; i++) {
+//            allEdibles[i] = edibleGhostLocs.get(i);
+//        }
         for (int i = 0; i < ppSize; i++) {
-            allEdibles[i + gSize] = powerPills.get(i);
+            //allEdibles[i + gSize] = powerPills.get(i);
+            allEdibles[i] = powerPills.get(i);
         }
         for (int i = 0; i < pSize; i++) {
-            allEdibles[i + gSize + ppSize] = pills.get(i);
+            allEdibles[i + ppSize] = pills.get(i);
+            //allEdibles[i + gSize + ppSize] = pills.get(i);
         }
         return allEdibles;
     }

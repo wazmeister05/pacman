@@ -51,7 +51,7 @@ public class Executor {
 		boolean visual = true;
 		int numTrials = 100;
 		exec.runExperiment(new WillStoltonPacman(), new Legacy(), numTrials);
-		//exec.runGameTimed(new WillStoltonPacman(), new Legacy(), visual);
+		exec.runGameTimed(new WillStoltonPacman(), new Legacy(), visual);
 
 		// run a game in synchronous mode: game waits until controllers respond.
 		// int delay = 16;
