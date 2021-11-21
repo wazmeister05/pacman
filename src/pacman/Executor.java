@@ -50,7 +50,7 @@ public class Executor {
 		// your submission
 		boolean visual = true;
 		int numTrials = 100;
-		exec.runExperiment(new WillStoltonPacman(), new Legacy(), numTrials);
+		//exec.runExperiment(new WillStoltonPacman(), new Legacy(), numTrials);
 		exec.runGameTimed(new WillStoltonPacman(), new Legacy(), visual);
 
 		// run a game in synchronous mode: game waits until controllers respond.

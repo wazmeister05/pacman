@@ -7,8 +7,7 @@ import pacman.game.Constants.GHOST;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
-import pacman.game.GameView;
-import java.awt.*;
+
 import java.util.*;
 
 /**
@@ -28,6 +27,8 @@ public class WillStoltonPacman extends Controller<MOVE> {
 
 
     private GHOST ghostTarget;
+    Map<GHOST, Integer> edible = new HashMap<>();
+    Map<GHOST, Integer> inedible = new HashMap<>();
     private MOVE chosenMove;
 
     /**
@@ -48,20 +49,10 @@ public class WillStoltonPacman extends Controller<MOVE> {
         GHOST[] ghosts = GHOST.values();
         //int[] allEdibles = getAllEdibles(game);
 
-        Map<GHOST, Integer> edible = new HashMap<>();
-        Map<GHOST, Integer> inedible = new HashMap<>();
+
 
         // Determine if ghost is edible or inedible and assign it so.
-        for (GHOST ghost : ghosts) {
-            if (game.getGhostLairTime(ghost) == 0) {
-                int ghostIndex = game.getGhostCurrentNodeIndex(ghost);
-                if (!game.isGhostEdible(ghost)) {
-                    inedible.put(ghost, (int)game.getEuclideanDistance(ghostIndex, msPLocation));
-                } else {
-                    edible.put(ghost, game.getShortestPathDistance(ghostIndex, msPLocation));
-                }
-            }
-        }
+        extracted(game, msPLocation, ghosts, edible, inedible);
 
         // If there is a closest ghost, run away from it. But consider edible ghosts.
         for (Map.Entry<GHOST, Integer> entry : inedible.entrySet()) {
@@ -73,20 +64,25 @@ public class WillStoltonPacman extends Controller<MOVE> {
         return sim(game, msPLocation, ghosts, powerPills(game), pills(game), edible, inedible);
     }
 
+    private void extracted(Game game, int msPLocation, GHOST[] ghosts, Map<GHOST, Integer> edible, Map<GHOST, Integer> inedible) {
+        for (GHOST ghost : ghosts) {
+            if (game.getGhostLairTime(ghost) == 0) {
+                int ghostIndex = game.getGhostCurrentNodeIndex(ghost);
+                if (!game.isGhostEdible(ghost)) {
+                    inedible.put(ghost, (int) game.getEuclideanDistance(ghostIndex, msPLocation));
+                } else {
+                    edible.put(ghost, game.getShortestPathDistance(ghostIndex, msPLocation));
+                }
+            }
+        }
+    }
+
 
     private MOVE sim(Game game, int msPLocation, GHOST[] ghosts, ArrayList<Integer> powerPills,
                      ArrayList<Integer> pills, Map<GHOST, Integer> edible, Map<GHOST, Integer> inedible){
         Map<Double, MOVE> scoreAndRoute = new HashMap<>();
-        double counter = Integer.MIN_VALUE;
-        ArrayList<GHOST> buffet = new ArrayList<>();
-        int distance = Integer.MAX_VALUE;
-        for (Map.Entry<GHOST, Integer> entry : edible.entrySet()) {
-            int currentGhostDistance = entry.getValue();
-            if (currentGhostDistance <= 100 && currentGhostDistance < distance) {
-                buffet.add(entry.getKey());
-                distance = currentGhostDistance;
-            }
-        }
+        ArrayList<GHOST> buffet = getGhosts(edible);
+        double counter;
         MOVE returnThis = null;
         final int SIZE = 100;
         RandomPacMan rpm = new RandomPacMan();
@@ -99,6 +95,7 @@ public class WillStoltonPacman extends Controller<MOVE> {
                 counter = Double.MIN_VALUE;
                 int round = 0;
                 while (round != SIZE) {
+                    pills = pills(future);
                     if (future.getPacmanNumberOfLivesRemaining() == lives - 1) {
                         path = null;
                         break;
@@ -112,11 +109,32 @@ public class WillStoltonPacman extends Controller<MOVE> {
                             future.advanceGame(move, new Legacy().getMove());
                         }
                         else if(buffet.size() > 0){
-                            GHOST ghost = buffet.get(0);
-                            future.advanceGame(future.getNextMoveTowardsTarget(msPLocation, game.getGhostCurrentNodeIndex(ghost),
-                                    future.getPacmanLastMoveMade(), DM.PATH), new Legacy().getMove());
-                        } else {
-                            future.advanceGame(rpm.getMove(future, System.currentTimeMillis()), new Legacy().getMove());
+                            if(ghostTarget != null && future.wasGhostEaten(ghostTarget)){
+                                buffet = getGhosts(edible);
+                                ghostTarget = buffet.get(0);
+                            }
+                            if(ghostTarget != null && future.isGhostEdible(ghostTarget)) {
+                                future.advanceGame(future.getNextMoveTowardsTarget(future.getPacmanCurrentNodeIndex(), future.getGhostCurrentNodeIndex(ghostTarget),
+                                        future.getPacmanLastMoveMade(), DM.PATH), new Legacy().getMove());
+                            }
+                            else if(ghostTarget != null && !future.isGhostEdible(ghostTarget)){
+                                ghostTarget = null;
+                                buffet.clear();
+                            }
+                            else{
+                                try {
+                                    ghostTarget = buffet.get(0);
+                                    buffet.remove(ghostTarget);
+                                    future.advanceGame(future.getNextMoveTowardsTarget(future.getPacmanCurrentNodeIndex(), future.getGhostCurrentNodeIndex(ghostTarget),
+                                            future.getPacmanLastMoveMade(), DM.PATH), new Legacy().getMove());
+                                }catch(Exception e){
+                                    future.advanceGame(rpm.getMove(future, System.currentTimeMillis()), new Legacy().getMove());
+                                }
+                            }
+                        }
+                        else {
+                            future.advanceGame(future.getNextMoveTowardsTarget(future.getPacmanCurrentNodeIndex(), pills.get(0),
+                                    future.getPacmanLastMoveMade() ,DM.PATH), new Legacy().getMove());
                         }
                     }
                 }
@@ -153,6 +171,19 @@ public class WillStoltonPacman extends Controller<MOVE> {
         return returnThis;
     }
 
+    private ArrayList<GHOST> getGhosts(Map<GHOST, Integer> edible) {
+        double counter = Integer.MIN_VALUE;
+        ArrayList<GHOST> buffet = new ArrayList<>();
+        int distance = Integer.MAX_VALUE;
+        for (Map.Entry<GHOST, Integer> entry : edible.entrySet()) {
+            int currentGhostDistance = entry.getValue();
+            if (currentGhostDistance <= 100 && currentGhostDistance < distance) {
+                buffet.add(entry.getKey());
+                distance = currentGhostDistance;
+            }
+        }
+        return buffet;
+    }
 
 
     /**
